@@ -144,10 +144,12 @@ class MyMainWindow(QMainWindow):
                 if (i == 0) and (j == 1):
                     continue
                 elif (i==0) and (j==0):
+
                     self.textbox = QLineEdit(self)
                     self.textbox.move(20,20)
-                    
+
                     continue
+
                 label = QLabel(container)
                 label.setText("Your QWidget at (%d, %d)" % (i, j))
                 label.setAlignment(QtCore.Qt.AlignHCenter |
@@ -172,15 +174,21 @@ class MyMainWindow(QMainWindow):
 
     def show_dialog(self):
 
-        fname = QFileDialog.getOpenFileName(self, 'Open file', '/home')
+        fname = QFileDialog.getOpenFileName(self, 'Open input data file', '/home')
+        osname = os.name
+        cwd = os.getcwd()
+        inputfilename = "input01.dat"
+        if osname == 'nt':  # in case of Windows
+            path = cwd+"\\"+inputfilename
+        else:  # Mac, Linux
+            path = cwd+"/"+inputfilename
 
         if fname[0]:
-            # ファイル読み込み
             f = open(fname[0], 'r')
 
             with f:
                 data = f.read()
-                # self.textEdit.setText(data)
+                print(data)
 
 
 ################################################################################
@@ -194,6 +202,5 @@ if __name__ == '__main__':
     app = QApplication.instance()
 
     window = MyMainWindow()
-
     # Start the main event loop.
     app.exec_()
