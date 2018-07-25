@@ -77,7 +77,7 @@ class MyVisuClass(HasTraits):
         s = 2 + sin(t)
 
         mlab.points3d(x, y, z, s, colormap="copper", scale_factor=.25,
-            figure=scene.mayavi_scene)
+                      figure=scene.mayavi_scene)
 
     def plot_node(self, scene, nodes):
         return
