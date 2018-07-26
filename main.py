@@ -26,7 +26,7 @@ from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from mayavi import mlab
 
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QAction,
-                             QFileDialog, QApplication, QWidget,
+                             QFileDialog, QApplication, QWidget, QSizePolicy,
                              QGridLayout, QLabel, QPushButton, QLineEdit, QMessageBox)
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -60,12 +60,14 @@ class MyVisuClass(HasTraits):
         # Notice how each mlab call points explicitely to the figure it
         # applies to.
         mlab.clf(figure=scene.mayavi_scene)
+        mlab.figure(figure=scene.mayavi_scene, bgcolor=(0.9,0.9,0.9))
         # mlab.figure(bgcolor=(1,1,1))
         x, y, z, s = np.random.random((4, 100))
         mlab.points3d(x, y, z, s, figure=scene.mayavi_scene)
 
     def test_points3d(self, scene):
         mlab.clf(figure=scene.mayavi_scene)
+        mlab.figure(figure=scene.mayavi_scene, bgcolor=(0.9,0.9,0.9))
 
         t = np.linspace(0, 4 * np.pi, 20)
         cos = np.cos
@@ -80,6 +82,7 @@ class MyVisuClass(HasTraits):
                       figure=scene.mayavi_scene)
 
     def plot_node(self, scene, nodes):
+        # under development
         return
 
     # The layout of the dialog created
@@ -142,17 +145,22 @@ class MyMainWindow(QMainWindow):
             for j in range(2):
                 if (i == 0) and (j == 1):
                     continue
-                elif (i==0) and (j==0):
+                elif (i == 0) and (j == 0):
 
-                    self.textbox = QLineEdit(self)
-                    self.textbox.move(20,20)
+                    self.textbox1 = QLineEdit(self)
+                    self.textbox1.setReadOnly(True)
+                    self.textbox1.move(20, 80)
+                    self.textbox1.resize(300,20)
 
                     continue
 
+                # qwidget_test01 = QWidget() ###
                 label = QLabel(container)
                 label.setText("Your QWidget at (%d, %d)" % (i, j))
                 label.setAlignment(QtCore.Qt.AlignHCenter |
                                    QtCore.Qt.AlignVCenter)
+                label.minimumWidth = 320
+                # label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
                 layout.addWidget(label, i, j)
 
@@ -161,7 +169,7 @@ class MyMainWindow(QMainWindow):
         # menubar
 
         open_file = QAction('Open', self)
-        open_file.setShortcut('Ctrl+o')
+        open_file.setShortcut('Ctrl+O')
         open_file.setStatusTip('opening new file...')
         open_file.triggered.connect(self.show_dialog)
 
@@ -173,21 +181,23 @@ class MyMainWindow(QMainWindow):
 
     def show_dialog(self):
 
-        fname = QFileDialog.getOpenFileName(self, 'Open input data file', '/home')
-        osname = os.name
-        cwd = os.getcwd()
-        inputfilename = "input01.dat"
-        if osname == 'nt':  # in case of Windows
-            path = cwd+"\\"+inputfilename
-        else:  # Mac, Linux
-            path = cwd+"/"+inputfilename
+        fname = QFileDialog.getOpenFileName(self, 'select input data file', '/home', "Data file (*.dat)")
+        # osname = os.name
+        # cwd = os.getcwd()
+
+        # inputfilename = "input01.dat"
+        # if osname == 'nt':  # in case of Windows
+        #     path = cwd+"\\"+inputfilename
+        # else:  # Mac, Linux
+        #     path = cwd+"/"+inputfilename
 
         if fname[0]:
             f = open(fname[0], 'r')
 
             with f:
                 data = f.read()
-                print(data)
+                self.textbox1.setText(str(fname[0]))
+                # print(data)
 
 
 ################################################################################
