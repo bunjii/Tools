@@ -123,7 +123,6 @@ class MayaviQWidget(QWidget):
 # UI
 ################################################################################
 
-
 class MyMainWindow(QMainWindow):
 
     def __init__(self):
