@@ -25,9 +25,10 @@ from traitsui.api import View, Item, HSplit, Group
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from mayavi import mlab
 
-from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QAction,
-                             QFileDialog, QApplication, QWidget, QSizePolicy,
-                             QGridLayout, QLabel, QPushButton, QLineEdit, QMessageBox)
+from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QAction, QDesktopWidget,
+                             QFileDialog, QApplication, QWidget, QSizePolicy, QBoxLayout,
+                             QGridLayout, QLabel, QPushButton, QLineEdit, 
+                             QHBoxLayout, QVBoxLayout, QMessageBox)
 from PyQt5.QtGui import QIcon
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSlot
@@ -37,34 +38,35 @@ from PyQt5.QtCore import pyqtSlot
 # Mayavi Part
 ################################################################################
 class MyVisuClass(HasTraits):
+
     scene1 = Instance(MlabSceneModel, ())
-    scene2 = Instance(MlabSceneModel, ())
+    #scene2 = Instance(MlabSceneModel, ())
 
     button1 = Button('Redraw')
-    button2 = Button('Redraw')
+    #button2 = Button('Redraw')
 
     def __init__(self):
         HasTraits.__init__(self)
-        self.test_points3d(self.scene1)
-        self.redraw_scene(self.scene2)
+        self.redraw_scene(self.scene1)
+        # self.redraw_scene(self.scene2)
 
     @on_trait_change('button1')
     def redraw_scene1(self):
-        self.test_points3d(self.scene1)
+        # self.test_points3d(self.scene1)
+        self.redraw_scene(self.scene1)
 
+    """
     @on_trait_change('button2')
     def redraw_scene2(self):
-        self.redraw_scene(self.scene2)
+        self.redraw_scene(self.scene2)  
+    """
 
     def redraw_scene(self, scene):
-        # Notice how each mlab call points explicitely to the figure it
-        # applies to.
         mlab.clf(figure=scene.mayavi_scene)
-        mlab.figure(figure=scene.mayavi_scene, bgcolor=(0.9,0.9,0.9))
-        # mlab.figure(bgcolor=(1,1,1))
+        mlab.figure(figure=scene.mayavi_scene, bgcolor=(0.3,0.3,0.3))
         x, y, z, s = np.random.random((4, 100))
         mlab.points3d(x, y, z, s, figure=scene.mayavi_scene)
-
+    """
     def test_points3d(self, scene):
         mlab.clf(figure=scene.mayavi_scene)
         mlab.figure(figure=scene.mayavi_scene, bgcolor=(0.9,0.9,0.9))
@@ -80,16 +82,20 @@ class MyVisuClass(HasTraits):
 
         mlab.points3d(x, y, z, s, colormap="copper", scale_factor=.25,
                       figure=scene.mayavi_scene)
-
+    """
     def plot_node(self, scene, nodes):
         # under development
         return
 
     # The layout of the dialog created
+    view = View(Item('scene1', editor=SceneEditor(scene_class=Scene), height=300,
+                     width=300, show_label=False), Item('button1', show_label=False))
+
+    """
     view = View(HSplit(
                   Group(
                        Item('scene1',
-                            editor=SceneEditor(), height=250,
+                            editor=SceneEditor(scene_class=Scene), height=250,
                             width=300),
                        'button1',
                        show_labels=False,
@@ -104,6 +110,7 @@ class MyVisuClass(HasTraits):
                 ),
                 resizable=True,
                 )
+    """
 
 ################################################################################
 # The QWidget containing the visualization, this is pure PyQt4 code.
@@ -130,17 +137,46 @@ class MyMainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
         self.initUI()
 
     def initUI(self):
-        container = QWidget()
-        layout = QGridLayout(container)
 
+        self.resize(1200,800)
+        
+        container = QWidget()
+        # layout = QGridLayout(container)
+        main_layout = QHBoxLayout(self)
         self.setWindowTitle('Structural Tools Ver.0.1')
-        self.setCentralWidget(container)
+        # self.setCentralWidget(container)
         self.statusBar()
 
         # put some stuff around mayavi
+        # left area
+        textbox1 = QLineEdit(self)
+        textbox1.setReadOnly(True)
+        textbox1.move(20, 80)
+        textbox1.resize(300, 20)
+
+        #label = QLabel(container)
+        #label.setText("Your QWidget at (%d, %d)" % (0, 0))
+        #label.setAlignment(QtCore.Qt.AlignHCenter |
+        #                    QtCore.Qt.AlignVCenter)
+        #label.resize(320, 600)
+        
+        #sp1 = label.sizePolicy()
+        #sp2 = MayaviQWidget(container).sizePolicy()
+        #sp1.setHorizontalStretch(1)
+        #sp2.setHorizontalStretch(5)
+        #label.setSizePolicy(sp1)
+        #MayaviQWidget(container).setSizePolicy(sp2)
+
+        # right area
+        main_layout.addWidget(MayaviQWidget())
+        #main_layout.addWidget(textbox1)
+        # self.setLayout(main_layout)
+
+        """
         for i in range(2):
             for j in range(2):
                 if (i == 0) and (j == 1):
@@ -163,8 +199,10 @@ class MyMainWindow(QMainWindow):
                 # label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
 
                 layout.addWidget(label, i, j)
+        """
 
-        layout.addWidget(MayaviQWidget(container), 0, 1)
+        
+        
 
         # menubar
 
@@ -212,4 +250,4 @@ if __name__ == '__main__':
 
     window = MyMainWindow()
     # Start the main event loop.
-    app.exec_()
+    sys.exit(app.exec_())
