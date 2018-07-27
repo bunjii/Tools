@@ -33,221 +33,68 @@ from PyQt5.QtGui import QIcon
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSlot
 
-
 ################################################################################
 # Mayavi Part
 ################################################################################
+
 class MyVisuClass(HasTraits):
+    scene = Instance(MlabSceneModel, ())
 
-    scene1 = Instance(MlabSceneModel, ())
-    #scene2 = Instance(MlabSceneModel, ())
+    @on_trait_change('scene.activated')
+    def update_plot(self):
+        # This function is called when the view is opened. We don't
+        # populate the scene when the view is not yet open, as some
+        # VTK features require a GLContext.
 
-    button1 = Button('Redraw')
-    #button2 = Button('Redraw')
+        # We can do normal mlab calls on the embedded scene.
+        self.scene.mlab.test_points3d()
 
-    def __init__(self):
-        HasTraits.__init__(self)
-        self.redraw_scene(self.scene1)
-        # self.redraw_scene(self.scene2)
-
-    @on_trait_change('button1')
-    def redraw_scene1(self):
-        # self.test_points3d(self.scene1)
-        self.redraw_scene(self.scene1)
-
-    """
-    @on_trait_change('button2')
-    def redraw_scene2(self):
-        self.redraw_scene(self.scene2)  
-    """
-
-    def redraw_scene(self, scene):
-        mlab.clf(figure=scene.mayavi_scene)
-        mlab.figure(figure=scene.mayavi_scene, bgcolor=(0.3,0.3,0.3))
-        x, y, z, s = np.random.random((4, 100))
-        mlab.points3d(x, y, z, s, figure=scene.mayavi_scene)
-    """
-    def test_points3d(self, scene):
-        mlab.clf(figure=scene.mayavi_scene)
-        mlab.figure(figure=scene.mayavi_scene, bgcolor=(0.9,0.9,0.9))
-
-        t = np.linspace(0, 4 * np.pi, 20)
-        cos = np.cos
-        sin = np.sin
-
-        x = sin(2 * t)
-        y = cos(t)
-        z = cos(2 * t)
-        s = 2 + sin(t)
-
-        mlab.points3d(x, y, z, s, colormap="copper", scale_factor=.25,
-                      figure=scene.mayavi_scene)
-    """
-    def plot_node(self, scene, nodes):
-        # under development
-        return
-
-    # The layout of the dialog created
-    view = View(Item('scene1', editor=SceneEditor(scene_class=Scene), height=300,
-                     width=300, show_label=False), Item('button1', show_label=False))
-
-    """
-    view = View(HSplit(
-                  Group(
-                       Item('scene1',
-                            editor=SceneEditor(scene_class=Scene), height=250,
-                            width=300),
-                       'button1',
-                       show_labels=False,
-                  ),
-                  Group(
-                       Item('scene2',
-                            editor=SceneEditor(scene_class=Scene), height=250,
-                            width=300, show_label=False),
-                       'button2',
-                       show_labels=False,
-                  ),
-                ),
-                resizable=True,
+    # the layout of the dialog screated
+    view = View(Item('scene', editor=SceneEditor(scene_class=Scene),
+                     height=250, width=300, show_label=False),
+                resizable=True  # We need this to resize with the parent widget
                 )
-    """
+
 
 ################################################################################
 # The QWidget containing the visualization, this is pure PyQt4 code.
-################################################################################
 class MayaviQWidget(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+        mayavi_layout = QtWidgets.QVBoxLayout(self)
+        mayavi_layout.setContentsMargins(0, 0, 0, 0)
+        mayavi_layout.setSpacing(0)
         self.visualization = MyVisuClass()
 
         # The edit_traits call will generate the widget to embed.
         self.ui = self.visualization.edit_traits(parent=self,
                                                  kind='subpanel').control
-        layout.addWidget(self.ui)
+        mayavi_layout.addWidget(self.ui)
         self.ui.setParent(self)
-
-################################################################################
-# UI
-################################################################################
-
-class MyMainWindow(QMainWindow):
-
-    def __init__(self):
-        super().__init__()
-
-        self.initUI()
-
-    def initUI(self):
-
-        self.resize(1200,800)
-        
-        container = QWidget()
-        # layout = QGridLayout(container)
-        main_layout = QHBoxLayout(self)
-        self.setWindowTitle('Structural Tools Ver.0.1')
-        # self.setCentralWidget(container)
-        self.statusBar()
-
-        # put some stuff around mayavi
-        # left area
-        textbox1 = QLineEdit(self)
-        textbox1.setReadOnly(True)
-        textbox1.move(20, 80)
-        textbox1.resize(300, 20)
-
-        #label = QLabel(container)
-        #label.setText("Your QWidget at (%d, %d)" % (0, 0))
-        #label.setAlignment(QtCore.Qt.AlignHCenter |
-        #                    QtCore.Qt.AlignVCenter)
-        #label.resize(320, 600)
-        
-        #sp1 = label.sizePolicy()
-        #sp2 = MayaviQWidget(container).sizePolicy()
-        #sp1.setHorizontalStretch(1)
-        #sp2.setHorizontalStretch(5)
-        #label.setSizePolicy(sp1)
-        #MayaviQWidget(container).setSizePolicy(sp2)
-
-        # right area
-        main_layout.addWidget(MayaviQWidget())
-        #main_layout.addWidget(textbox1)
-        # self.setLayout(main_layout)
-
-        """
-        for i in range(2):
-            for j in range(2):
-                if (i == 0) and (j == 1):
-                    continue
-                elif (i == 0) and (j == 0):
-
-                    self.textbox1 = QLineEdit(self)
-                    self.textbox1.setReadOnly(True)
-                    self.textbox1.move(20, 80)
-                    self.textbox1.resize(300,20)
-
-                    continue
-
-                # qwidget_test01 = QWidget() ###
-                label = QLabel(container)
-                label.setText("Your QWidget at (%d, %d)" % (i, j))
-                label.setAlignment(QtCore.Qt.AlignHCenter |
-                                   QtCore.Qt.AlignVCenter)
-                label.minimumWidth = 320
-                # label.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-
-                layout.addWidget(label, i, j)
-        """
-
-        
-        
-
-        # menubar
-
-        open_file = QAction('Open', self)
-        open_file.setShortcut('Ctrl+O')
-        open_file.setStatusTip('opening new file...')
-        open_file.triggered.connect(self.show_dialog)
-
-        menubar = self.menuBar()
-        file_menu = menubar.addMenu('&File')
-        file_menu.addAction(open_file)
-
-        self.show()
-
-    def show_dialog(self):
-
-        fname = QFileDialog.getOpenFileName(self, 'select input data file', '/home', "Data file (*.dat)")
-        # osname = os.name
-        # cwd = os.getcwd()
-
-        # inputfilename = "input01.dat"
-        # if osname == 'nt':  # in case of Windows
-        #     path = cwd+"\\"+inputfilename
-        # else:  # Mac, Linux
-        #     path = cwd+"/"+inputfilename
-
-        if fname[0]:
-            f = open(fname[0], 'r')
-
-            with f:
-                data = f.read()
-                self.textbox1.setText(str(fname[0]))
-                # print(data)
-
 
 ################################################################################
 # MAIN
 ################################################################################
-if __name__ == '__main__':
 
-    # Don't create a new QApplication, it would unhook the Events
-    # set by Traits on the existing QApplication. Simply use the
-    # '.instance()' method to retrieve the existing one.
+if __name__ == "__main__":
     app = QApplication.instance()
+    container = QWidget()
+    container.setWindowTitle("Embedding Mayavi in a PyQt4 Application")
+    # define a "complex" layout to test the behaviour
+    layout = QGridLayout(container)
 
-    window = MyMainWindow()
+    label = QtWidgets.QLabel(container)
+    label.setText("Your QWidget aiueo kakikukeko at (%d, %d)" % (0, 0))
+    label.setAlignment(QtCore.Qt.AlignHCenter | QtCore.Qt.AlignVCenter)
+    layout.addWidget(label, 0, 0)
+
+    mayavi_widget = MayaviQWidget(container)
+
+    layout.addWidget(mayavi_widget, 0, 1)
+    # container.show()
+    window = QMainWindow()
+    window.setCentralWidget(container)
+    window.show()
+
     # Start the main event loop.
     sys.exit(app.exec_())
