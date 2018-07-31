@@ -125,7 +125,7 @@ class MyMainWindow(QMainWindow):
 
         import_action = QAction('Import data', self)
         import_action.setShortcut('Ctrl+O')
-        import_action.triggered.connect(self.show_dialog)
+        import_action.triggered.connect(self.show_open_dialog)
 
         close_action = QAction('&Close', self)
         close_action.setShortcut('Ctrl+W')
@@ -138,17 +138,18 @@ class MyMainWindow(QMainWindow):
         
         self.show()
 
-    def show_dialog(self):
+    def show_open_dialog(self):
         self.fname = QFileDialog.getOpenFileName(
             self, 'select input data file', '/home', "Data file (*.dat)")
 
         if self.fname[0]:
             f = open(self.fname[0], 'r')
-            self.setWindowTitle(self.window_title+":: "+str(self.fname[0]))
+            self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
 
             with f:
-                data = f.read()
-                # ReadInput
+                
+                filelines = f.readlines()
+                ReadInput(filelines, data)
                 self.mayavi_widget.visualization.update()
                 
     def plot(self,data):
@@ -161,14 +162,14 @@ class MyMainWindow(QMainWindow):
 # ****** VARIABLES ******
 def SetStrData():
 
-    ns = Nodes()
+    nds = Nodes()
     elms = Elements()
     mts = Materials()
     secs = Sections()
     consts = Constraints()
     lds = Loads()
 
-    str_data = StructuralData(ns, elms, mts, secs, consts, lds)
+    str_data = StructuralData(nds, elms, mts, secs, consts, lds)
 
     return str_data
 

@@ -53,11 +53,8 @@ def ReadInput(filename, _nodes, _elements, _materials,
         else: continue
 """
 
-def ReadInput(filename, _strData):
-# def ReadInput(filename, _nodes, _elements, _materials, _secs, _constraints, _loads):
-    dataIn = open(filename, 'r')
-    lines = dataIn.readlines()
-    dataIn.close()
+def ReadInput(_filelines, _strdata):
+    lines = _filelines
 
     for i in range(len(lines)):
         items = []

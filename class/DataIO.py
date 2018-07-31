@@ -8,12 +8,52 @@ import Node
 
 # ****** DATA INPUT ******
 
-def ReadInput(filename, _nodes, _elements, _materials,
-              _secs, _constraints, _loads):
+# def ReadInput(filename, _nodes, _elements, _materials,
+#               _secs, _constraints, _loads):
 
-    dataIn = open(filename, 'r')
+#     dataIn = open(filename, 'r')
+#     lines = dataIn.readlines()
+#     dataIn.close()
+
+#     for i in range(len(lines)):
+#         items = []
+#         if lines[i].startswith('#'):
+#             continue
+#         # node id, x, y
+#         elif lines[i].startswith('n') or lines[i].startswith('N'):
+#             items = lines[i].split(',')
+#             _nodes.append_node(int(items[1]), float(items[2]), float(items[3]))
+#         # element id, n1, n2, material type, section type
+#         elif lines[i].startswith('elem'):
+#             items = lines[i].split(',')
+#             _elements.appendElement( \
+#             int(items[1]), int(items[2]), int(items[3]), int(items[4]), int(items[5]))
+#         # material id, name, e-module
+#         elif lines[i].startswith('mat'):
+#             items = lines[i].split(',')
+#             _materials.appendMaterial(int(items[1]), str(items[2].strip()), float(items[3]))
+#         # section id, area, moment of inertia
+#         elif lines[i].startswith('sec'):
+#             items = lines[i].split(',')
+#             _secs.appendSection(int(items[1]), float(items[2]), float(items[3]))
+#         # constraint id, node id, condition x, condition y
+#         elif lines[i].startswith('constr'):
+#             items = lines[i].split(',')
+#             _constraints.appendConstraint( \
+#             int(items[1]), int(items[2]), int(items[3]), int(items[4]))
+#         # load id, node id, load x, load y
+#         elif lines[i].startswith('load'):
+#             items = lines[i].split(',')
+#             _loads.appendLoad(int(items[1]), int(items[2]), float(items[3]), float(items[4]))
+
+#         else: continue
+
+
+def ReadInput(_filelines, _strdata):
+
+    # dataIn = open(filename, 'r')
     lines = dataIn.readlines()
-    dataIn.close()
+    # dataIn.close()
 
     for i in range(len(lines)):
         items = []
@@ -26,27 +66,31 @@ def ReadInput(filename, _nodes, _elements, _materials,
         # element id, n1, n2, material type, section type
         elif lines[i].startswith('elem'):
             items = lines[i].split(',')
-            _elements.appendElement( \
-            int(items[1]), int(items[2]), int(items[3]), int(items[4]), int(items[5]))
+            _elements.appendElement(
+                int(items[1]), int(items[2]), int(items[3]), int(items[4]), int(items[5]))
         # material id, name, e-module
         elif lines[i].startswith('mat'):
             items = lines[i].split(',')
-            _materials.appendMaterial(int(items[1]), str(items[2].strip()), float(items[3]))
+            _materials.appendMaterial(int(items[1]), str(
+                items[2].strip()), float(items[3]))
         # section id, area, moment of inertia
         elif lines[i].startswith('sec'):
             items = lines[i].split(',')
-            _secs.appendSection(int(items[1]), float(items[2]), float(items[3]))
+            _secs.appendSection(int(items[1]), float(
+                items[2]), float(items[3]))
         # constraint id, node id, condition x, condition y
         elif lines[i].startswith('constr'):
             items = lines[i].split(',')
-            _constraints.appendConstraint( \
-            int(items[1]), int(items[2]), int(items[3]), int(items[4]))
+            _constraints.appendConstraint(
+                int(items[1]), int(items[2]), int(items[3]), int(items[4]))
         # load id, node id, load x, load y
         elif lines[i].startswith('load'):
             items = lines[i].split(',')
-            _loads.appendLoad(int(items[1]), int(items[2]), float(items[3]), float(items[4]))
+            _loads.appendLoad(int(items[1]), int(
+                items[2]), float(items[3]), float(items[4]))
 
-        else: continue
+        else:
+            continue
 
 def readInput2dR(filename, _nodes, _elements, _materials,
                  _secs, _constraints, _loads):
