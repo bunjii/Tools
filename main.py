@@ -150,9 +150,7 @@ class MyMainWindow(QMainWindow):
                 data = f.read()
                 # ReadInput
                 self.mayavi_widget.visualization.update()
-
-                # print(data)
-    
+                
     def plot(self,data):
         pass
 
@@ -161,15 +159,18 @@ class MyMainWindow(QMainWindow):
 ################################################################################
 
 # ****** VARIABLES ******
+def SetStrData():
 
-ns = Nodes()
-elms = Elements()
-mts = Materials()
-secs = Sections()
-consts = Constraints()
-lds = Loads()
+    ns = Nodes()
+    elms = Elements()
+    mts = Materials()
+    secs = Sections()
+    consts = Constraints()
+    lds = Loads()
 
-str_data = StructuralData(ns, elms, mts, secs, consts, lds)
+    str_data = StructuralData(ns, elms, mts, secs, consts, lds)
+
+    return str_data
 
 
 ################################################################################
@@ -181,5 +182,5 @@ if __name__ == "__main__":
 
     app = QApplication.instance()    
     window = MyMainWindow()
-
+    data = SetStrData()
     sys.exit(app.exec_())
