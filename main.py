@@ -3,21 +3,10 @@
 import os
 import sys
 import numpy as np
-#os.environ['ETS_TOOLKIT'] = 'qt4'
-# By default, the PySide binding will be used. If you want the PyQt bindings
-# to be used, you need to set the QT_API environment variable to 'pyqt'
-#os.environ['QT_API'] = 'pyqt5'
 
 import sip
 sip.setapi('QString', 2)
 
-# To be able to use PySide or PyQt4 and not run in conflicts with traits,
-# we need to import QtGui and QtCore from pyface.qt
-#from pyface.qt import QtGui, QtCore
-# Alternatively, you can bypass this line, but you need to make sure that
-# the following lines are executed before the import of PyQT:
-#   import sip
-#   sip.setapi('QString', 2)
 from tvtk.pyface.api import Scene
 
 from traits.api import HasTraits, Instance, Button, on_trait_change
@@ -45,6 +34,7 @@ from solver.classSolve import obtainDefVector
 from solver.classSolve import obtainNormalForceStressStrain
 from solver.Node import Nodes
 from solver.DataIO import ReadInput, summaryInputData, resultTruss2d
+from solver.StrData import StructuralData
 
 ################################################################################
 # Mayavi Part
@@ -162,7 +152,6 @@ class MyMainWindow(QMainWindow):
 
 # ****** VARIABLES ******
 
-
 ns = Nodes()
 elms = Elements()
 mts = Materials()
@@ -170,6 +159,7 @@ secs = Sections()
 consts = Constraints()
 lds = Loads()
 
+str_data = StructuralData(ns, elms, mts, secs, consts, lds)
 
 
 ################################################################################

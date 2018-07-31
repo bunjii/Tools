@@ -10,6 +10,7 @@ import solver.classElement
 
 # ****** DATA INPUT ******
 
+"""
 def ReadInput(filename, _nodes, _elements, _materials,
               _secs, _constraints, _loads):
 
@@ -50,6 +51,7 @@ def ReadInput(filename, _nodes, _elements, _materials,
             _loads.appendLoad(int(items[1]), int(items[2]), float(items[3]), float(items[4]))
 
         else: continue
+"""
 
 def ReadInput(filename, _strData):
 # def ReadInput(filename, _nodes, _elements, _materials, _secs, _constraints, _loads):

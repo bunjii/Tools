@@ -36,7 +36,7 @@ if osname == 'nt': # in case of Windows
 else: # Mac, Linux
     path = cwd+"/"+inputfilename
 
-ReadInput(path, ns, elms, mts, secs, consts, lds)
+# ReadInput(path, ns, elms, mts, secs, consts, lds)
 
 # ****** PREPROCESS ******
 elms.appendElemLengthAngle(ns)

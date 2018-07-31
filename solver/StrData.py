@@ -9,7 +9,7 @@ from solver.classSolve import obtainInverseMatrix
 from solver.classSolve import obtainDefVector
 from solver.classSolve import obtainNormalForceStressStrain
 from solver.Node import Nodes
-from solver.DataIO import ReadInput, summaryInputData, resultTruss2d
+ # from solver.DataIO import ReadInput, summaryInputData, resultTruss2d
 
 class StructuralData():
     def __init__(self, _nds, _elems, _mats, _secs, _consts, _loads):
@@ -19,4 +19,3 @@ class StructuralData():
         Secs = _secs
         Consts = _consts
         Loads = _loads
-
