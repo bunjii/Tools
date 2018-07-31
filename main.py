@@ -118,7 +118,7 @@ class MyMainWindow(QMainWindow):
 
         # menubar
         menubar = self.menuBar()
-        
+
         file_menu = menubar.addMenu('&File')
         edit_menu = menubar.addMenu('&Edit')
         solve_menu = menubar.addMenu('&Solve')
@@ -127,14 +127,14 @@ class MyMainWindow(QMainWindow):
         import_action.setShortcut('Ctrl+O')
         import_action.triggered.connect(self.show_dialog)
 
-        exit_action = QAction('&Exit', self)
-        exit_action.setShortcut('Ctrl+Q')
-        exit_action.triggered.connect(self.close)
+        close_action = QAction('&Close', self)
+        close_action.setShortcut('Ctrl+W')
+        close_action.triggered.connect(self.close)
 
         file_menu.addAction(import_action)
-        file_menu.addAction(exit_action)
+        file_menu.addAction(close_action)
         edit_menu.addAction(import_action)
-        solve_menu.addAction(exit_action)
+        solve_menu.addAction(close_action)
         
         self.show()
 
