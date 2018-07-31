@@ -3,7 +3,7 @@ Created on 2011/12/26
 
 @author: troc
 '''
-from Node import *
+from solver.Node import *
 from numpy import *
 #from sets import Set # unnecessary to load in python 2.7 ?? need to confirm.
 

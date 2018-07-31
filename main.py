@@ -33,32 +33,54 @@ from PyQt5.QtGui import QIcon
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import pyqtSlot
 
+from solver.classConstraint import Constraints
+from solver.classElement import Elements
+from solver.classMaterial import Materials
+from solver.classSection import Sections
+from solver.classLoad import Loads
+from solver.classSolve import createStiffnessMatrix2d
+from solver.classSolve import createLoadVector2d
+from solver.classSolve import obtainInverseMatrix
+from solver.classSolve import obtainDefVector
+from solver.classSolve import obtainNormalForceStressStrain
+from solver.Node import Nodes
+from solver.DataIO import ReadInput, summaryInputData, resultTruss2d
+
 ################################################################################
 # Mayavi Part
 ################################################################################
 
 class MyVisuClass(HasTraits):
+
     scene = Instance(MlabSceneModel, ())
 
-    def redraw_scene(self, scene):
-        mlab.clf(figure=scene.mayavi_scene)
-        mlab.figure(figure=scene.mayavi_scene, bgcolor=(0.15, 0.15, 0.15))
+    def redraw_scene(self):
+        mlab.clf(figure=self.scene.mayavi_scene)
+        mlab.figure(figure=self.scene.mayavi_scene, bgcolor=(0.15, 0.15, 0.15))
         x, y, z, s = np.random.random((4, 100))
-        mlab.points3d(x, y, z, s, figure=scene.mayavi_scene)
+        mlab.points3d(x, y, z, s, figure=self.scene.mayavi_scene)
+
+    def update(self):
+        # print("update executed")
+        mlab.clf()  # Clear the figure
+        t = np.linspace(0, 20, 200)
+        mlab.plot3d(np.sin(t), np.cos(t), 0.1*t, t, figure=self.scene.mayavi_scene)
 
     @on_trait_change('scene.activated')
     def update_plot(self):
-        self.redraw_scene(self.scene)
+        # self.redraw_scene(self.scene)
+        self.redraw_scene()
 
     # the layout of the dialog screated
     view = View(Item('scene', editor=SceneEditor(scene_class=Scene),
                      height=250, width=300, show_label=False),
                 resizable=True  # We need this to resize with the parent widget
-                )
+               )
 
 
 ################################################################################
 # The QWidget containing the visualization, this is pure PyQt4 code.
+################################################################################
 class MayaviQWidget(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -107,14 +129,13 @@ class MyMainWindow(QMainWindow):
         # menubar
         self.menubar = self.menuBar()
         self.file_menu = self.menubar.addMenu('&File')
+        self.edit_menu = self.menubar.addMenu('&Edit')
+        self.solve_menu = self.menubar.addMenu('&Solve')
 
         self.import_action = QAction('Import data', self)
         self.import_action.setShortcut('Ctrl+O')
         self.import_action.triggered.connect(self.show_dialog)
-        self.new_action = QAction('New', self)
         self.file_menu.addAction(self.import_action)
-        self.file_menu.addAction(self.new_action)
-
         self.show()
 
     def show_dialog(self):
@@ -127,10 +148,28 @@ class MyMainWindow(QMainWindow):
 
             with f:
                 data = f.read()
+                # ReadInput
+                self.mayavi_widget.visualization.update()
+
                 # print(data)
     
     def plot(self,data):
         pass
+
+################################################################################
+# STRUCTURAL MODEL
+################################################################################
+
+# ****** VARIABLES ******
+
+
+ns = Nodes()
+elms = Elements()
+mts = Materials()
+secs = Sections()
+consts = Constraints()
+lds = Loads()
+
 
 
 ################################################################################
@@ -140,11 +179,7 @@ class MyMainWindow(QMainWindow):
 
 if __name__ == "__main__":
 
-    app = QApplication.instance()
-    # define a "complex" layout to test the behaviour
-    
-    # container.show()
+    app = QApplication.instance()    
     window = MyMainWindow()
 
-    # Start the main event loop.
     sys.exit(app.exec_())

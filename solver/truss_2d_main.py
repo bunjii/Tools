@@ -4,18 +4,18 @@
 """
 import os
 #from pathlib import Path
-from classConstraint import Constraints
-from classElement import Elements
-from classMaterial import Materials
-from classSection import Sections
-from classLoad import Loads
-from classSolve import createStiffnessMatrix2d
-from classSolve import createLoadVector2d
-from classSolve import obtainInverseMatrix
-from classSolve import obtainDefVector
-from classSolve import obtainNormalForceStressStrain
-from Node import Nodes
-from DataIO import ReadInput, summaryInputData, resultTruss2d
+from solver.classConstraint import Constraints
+from solver.classElement import Elements
+from solver.classMaterial import Materials
+from solver.classSection import Sections
+from solver.classLoad import Loads
+from solver.classSolve import createStiffnessMatrix2d
+from solver.classSolve import createLoadVector2d
+from solver.classSolve import obtainInverseMatrix
+from solver.classSolve import obtainDefVector
+from solver.classSolve import obtainNormalForceStressStrain
+from solver.Node import Nodes
+from solver.DataIO import ReadInput, summaryInputData, resultTruss2d
 
 # from numpy import *
 

@@ -1,7 +1,7 @@
 
 from numpy import *
 import math 
-from Node import Node, Nodes
+from solver.Node import Node, Nodes
 
 # ***** PROPERTY CLASS *****
 class Element(object):
