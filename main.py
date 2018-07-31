@@ -14,7 +14,7 @@ from traitsui.api import View, Item, HSplit, Group
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from mayavi import mlab
 
-from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QAction, QDesktopWidget,
+from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QAction, QDesktopWidget, qApp,
                              QFileDialog, QApplication, QWidget, QSizePolicy, QBoxLayout,
                              QGridLayout, QLabel, QPushButton, QLineEdit, QMenu,
                              QHBoxLayout, QVBoxLayout, QMessageBox, QTabWidget)
@@ -117,15 +117,25 @@ class MyMainWindow(QMainWindow):
         self.layout.addWidget(self.mayavi_widget, 0, 1)
 
         # menubar
-        self.menubar = self.menuBar()
-        self.file_menu = self.menubar.addMenu('&File')
-        self.edit_menu = self.menubar.addMenu('&Edit')
-        self.solve_menu = self.menubar.addMenu('&Solve')
+        menubar = self.menuBar()
+        
+        file_menu = menubar.addMenu('&File')
+        edit_menu = menubar.addMenu('&Edit')
+        solve_menu = menubar.addMenu('&Solve')
 
-        self.import_action = QAction('Import data', self)
-        self.import_action.setShortcut('Ctrl+O')
-        self.import_action.triggered.connect(self.show_dialog)
-        self.file_menu.addAction(self.import_action)
+        import_action = QAction('Import data', self)
+        import_action.setShortcut('Ctrl+O')
+        import_action.triggered.connect(self.show_dialog)
+
+        exit_action = QAction('&Exit', self)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.triggered.connect(self.close)
+
+        file_menu.addAction(import_action)
+        file_menu.addAction(exit_action)
+        edit_menu.addAction(import_action)
+        solve_menu.addAction(exit_action)
+        
         self.show()
 
     def show_dialog(self):
