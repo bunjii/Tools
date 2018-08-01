@@ -55,6 +55,12 @@ def ReadInput(filename, _nodes, _elements, _materials,
 
 def ReadInput(_filelines, _strdata):
     lines = _filelines
+    _nodes = _strdata.Nodes
+    _elements = _strdata.Elems
+    _materials = _strdata.Mats
+    _secs = _strdata.Secs
+    _constraints = _strdata.Consts
+    _loads = _strdata.Loads
 
     for i in range(len(lines)):
         items = []

@@ -1,3 +1,4 @@
+import math
 
 # ***** PROPERTY CLASS *****
 class Load(object):
@@ -7,6 +8,7 @@ class Load(object):
         self.nodeId = _nodeId
         self.loadX = _loadX
         self.loadY = _loadY
+        self.vecLength = math.sqrt(_loadX ** 2 + _loadY ** 2)
         
 class Load2dR(object):
     
@@ -25,14 +27,16 @@ class Load3d(object):
         self.loadX = _loadX
         self.loadY = _loadY
         self.loadZ = _loadZ
-        
 
 class Loads(object):
     def __init__(self):
         self.loads = []
+        self.maxLength = -999
         
     def appendLoad(self, _id, _nodeId, _loadX, _loadY):
         self.loads.append(Load(_id, _nodeId, _loadX, _loadY))
+        if self.loads[-1].vecLength > self.maxLength:
+            self.maxLength = self.loads[-1].vecLength
         
     def appendLoad2dR(self, _id, _nodeId, _loadX, _loadY, _moment):
         self.loads.append(Load2dR(_id, _nodeId, _loadX, _loadY, _moment))

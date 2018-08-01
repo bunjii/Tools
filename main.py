@@ -1,40 +1,40 @@
-# First, and before importing any Enthought packages, set the ETS_TOOLKIT
-# environment variable to qt4, to tell Traits that we will use Qt.
 import os
 import sys
+
 import numpy as np
-
-import sip
-sip.setapi('QString', 2)
-
+from mayavi import mlab
+from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import (QAction, QApplication, QBoxLayout, QDesktopWidget,
+                             QFileDialog, QGridLayout, QHBoxLayout, QLabel,
+                             QLineEdit, QMainWindow, QMenu, QMessageBox,
+                             QPushButton, QSizePolicy, QTabWidget, QTextEdit,
+                             QVBoxLayout, QWidget, qApp)
+from traits.api import Button, HasTraits, Instance, on_trait_change
+from traitsui.api import Group, HSplit, Item, View
 from tvtk.pyface.api import Scene
 
-from traits.api import HasTraits, Instance, Button, on_trait_change
-from traitsui.api import View, Item, HSplit, Group
-from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
-from mayavi import mlab
-
-from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QAction, QDesktopWidget, qApp,
-                             QFileDialog, QApplication, QWidget, QSizePolicy, QBoxLayout,
-                             QGridLayout, QLabel, QPushButton, QLineEdit, QMenu,
-                             QHBoxLayout, QVBoxLayout, QMessageBox, QTabWidget)
-from PyQt5.QtGui import QIcon
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import pyqtSlot
-
+import sip
 from solver.classConstraint import Constraints
 from solver.classElement import Elements
+from solver.classLoad import Loads
 from solver.classMaterial import Materials
 from solver.classSection import Sections
-from solver.classLoad import Loads
-from solver.classSolve import createStiffnessMatrix2d
-from solver.classSolve import createLoadVector2d
-from solver.classSolve import obtainInverseMatrix
-from solver.classSolve import obtainDefVector
-from solver.classSolve import obtainNormalForceStressStrain
+from solver.classSolve import (createLoadVector2d, createStiffnessMatrix2d,
+                               obtainDefVector, obtainInverseMatrix,
+                               obtainNormalForceStressStrain)
+from solver.Condition import Conditions
+from solver.DataIO import ReadInput, resultTruss2d, summaryInputData
 from solver.Node import Nodes
-from solver.DataIO import ReadInput, summaryInputData, resultTruss2d
 from solver.StrData import StructuralData
+
+sip.setapi('QString', 2)
+
+
+
+
 
 ################################################################################
 # Mayavi Part
@@ -43,30 +43,80 @@ from solver.StrData import StructuralData
 class MyVisuClass(HasTraits):
 
     scene = Instance(MlabSceneModel, ())
-
+    # the layout of the dialog created
+    view = View(Item('scene', editor=SceneEditor(scene_class=Scene),
+                     height=250, width=300, show_label=False),
+                resizable=True )  # We need this to resize with the parent widget
+               
     def redraw_scene(self):
         mlab.clf(figure=self.scene.mayavi_scene)
         mlab.figure(figure=self.scene.mayavi_scene, bgcolor=(0.15, 0.15, 0.15))
-        x, y, z, s = np.random.random((4, 100))
-        mlab.points3d(x, y, z, s, figure=self.scene.mayavi_scene)
 
-    def update(self):
-        # print("update executed")
-        mlab.clf()  # Clear the figure
-        t = np.linspace(0, 20, 200)
-        mlab.plot3d(np.sin(t), np.cos(t), 0.1*t, t, figure=self.scene.mayavi_scene)
+
+    def plot_model_geometry(self, _strdata):
+        mlab.clf(figure=self.scene.mayavi_scene) 
+        # mlab.axes(x_axis_visibility=True, y_axis_visibility=True, z_axis_visibility=True)
+        
+        # node
+        nodes = _strdata.Nodes.nodes
+        num_node = len(nodes)
+        xlist = []
+        ylist = []
+        zlist = []
+        for i in range(len(nodes)):
+            xlist.append(nodes[i].x)
+            ylist.append(nodes[i].y)
+            # zlist.append(nodes[i].z)
+        x = np.array(xlist)
+        y = np.array(ylist)
+        z = np.zeros(num_node) # zero element for 2d analysis
+
+        mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, resolution=64, scale_factor=0.2)
+
+        # elem
+        elems = _strdata.Elems.elements
+        num_elem = len(elems)
+
+        for i in range(num_elem):
+            n1 = elems[i].n1
+            n2 = elems[i].n2
+            self.LinePlot(n1, n2, _strdata.Nodes)
+        
+        # loads
+        loads = _strdata.Loads.loads
+        num_loads = len(loads)
+        for i in range(num_loads):
+            self.show_load_vec(loads[i], _strdata)
+
+        # global axes
+        mlab.orientation_axes(figure=self.scene.mayavi_scene, opacity=1.0, line_width=1.0)  
+
+    
+    def show_load_vec(self, _load, _strdata):
+        # loads
+        nd = _strdata.Nodes.findNodeById(_load.nodeId)
+        maxVecLength = _strdata.Loads.maxLength 
+        # node X = nd.x
+        # node Y = nd.y
+        # node Z = 0
+        if _load.loadX != 0:
+            
+
+            pass
+
 
     @on_trait_change('scene.activated')
     def update_plot(self):
-        # self.redraw_scene(self.scene)
         self.redraw_scene()
+    
+    def reset_view_xy(self):
+        mlab.view(0,0)
 
-    # the layout of the dialog screated
-    view = View(Item('scene', editor=SceneEditor(scene_class=Scene),
-                     height=250, width=300, show_label=False),
-                resizable=True  # We need this to resize with the parent widget
-               )
-
+    @staticmethod
+    def LinePlot(_sid, _eid, _nodes):
+        spt = _nodes.findNodeById(_sid)
+        ept = _nodes.findNodeById(_eid)
+        mlab.plot3d([spt.x, ept.x],[spt.y,ept.y],[0.0,0.0])
 
 ################################################################################
 # The QWidget containing the visualization, this is pure PyQt4 code.
@@ -121,19 +171,31 @@ class MyMainWindow(QMainWindow):
 
         file_menu = menubar.addMenu('&File')
         edit_menu = menubar.addMenu('&Edit')
+        view_menu = menubar.addMenu('&View')
         solve_menu = menubar.addMenu('&Solve')
 
+        # "file" actions
         import_action = QAction('Import data', self)
         import_action.setShortcut('Ctrl+O')
         import_action.triggered.connect(self.show_open_dialog)
 
         close_action = QAction('&Close', self)
-        close_action.setShortcut('Ctrl+W')
+        close_action.setShortcut('Alt+F4')
         close_action.triggered.connect(self.close)
 
+        # "view" actions
+        view_xy_action = QAction('&XY plane', self)
+        view_xy_action.setShortcut('Ctrl+1')
+        view_xy_action.triggered.connect(self.mayavi_widget.visualization.reset_view_xy)
+
+        # "solve" actions
+        # solve
+
+        # register actions to menu
         file_menu.addAction(import_action)
         file_menu.addAction(close_action)
         edit_menu.addAction(import_action)
+        view_menu.addAction(view_xy_action)
         solve_menu.addAction(close_action)
         
         self.show()
@@ -142,18 +204,14 @@ class MyMainWindow(QMainWindow):
         self.fname = QFileDialog.getOpenFileName(
             self, 'select input data file', '/home', "Data file (*.dat)")
 
-        if self.fname[0]:
-            f = open(self.fname[0], 'r')
-            self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
+        if not self.fname[0]:
+            pass
 
-            with f:
-                
-                filelines = f.readlines()
-                ReadInput(filelines, data)
-                self.mayavi_widget.visualization.update()
-                
-    def plot(self,data):
-        pass
+        f = open(self.fname[0], 'r')
+        self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
+ 
+        ReadInput(f.readlines(), data)
+        self.mayavi_widget.visualization.plot_model_geometry(data)                
 
 ################################################################################
 # STRUCTURAL MODEL
@@ -168,8 +226,9 @@ def SetStrData():
     secs = Sections()
     consts = Constraints()
     lds = Loads()
+    conds = Conditions()
 
-    str_data = StructuralData(nds, elms, mts, secs, consts, lds)
+    str_data = StructuralData(nds, elms, mts, secs, consts, lds, conds)
 
     return str_data
 
