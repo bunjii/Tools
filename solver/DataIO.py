@@ -61,6 +61,8 @@ def ReadInput(_filelines, _strdata):
     _secs = _strdata.Secs
     _constraints = _strdata.Consts
     _loads = _strdata.Loads
+    _conds = _strdata.Conds
+
 
     for i in range(len(lines)):
         items = []
@@ -92,6 +94,10 @@ def ReadInput(_filelines, _strdata):
         elif lines[i].startswith('load'):
             items = lines[i].split(',')
             _loads.appendLoad(int(items[1]), int(items[2]), float(items[3]), float(items[4]))
+
+        elif lines[i].startswith('a'):
+            items = lines[i].split(',')
+            _conds.AnalysisType = items[1]
 
         else: continue
 

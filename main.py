@@ -96,9 +96,7 @@ class MyVisuClass(HasTraits):
         # node Z = 0
         if _load.loadX != 0:
             
-
             pass
-
 
     @on_trait_change('scene.activated')
     def update_plot(self):
@@ -152,7 +150,20 @@ class MyMainWindow(QMainWindow):
 
         # left area
         self.leftarea = QWidget(self.container)
-        self.leftarea.setFixedSize(400, 800)
+        self.leftarea.setFixedWidth(600) #.resize(600, 800)
+        self.leftarea.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
+        # left area tab
+        self.tabs = QTabWidget(self.leftarea)
+        self.tabs.setFixedWidth(580)
+        self.tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.tabs.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.tab1 = QLineEdit(self.tabs)
+        self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.tab2 = QWidget()
+        self.tabs.addTab(self.tab1, "TEXT")
+        self.tabs.addTab(self.tab2, "ELSE")
+
+        
 
         # right area
         self.mayavi_widget = MayaviQWidget(self.container)
