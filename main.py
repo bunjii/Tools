@@ -17,6 +17,7 @@ from traitsui.api import Group, HSplit, Item, View
 from tvtk.pyface.api import Scene
 
 import sip
+sip.setapi('QString', 2)
 from solver.classConstraint import Constraints
 from solver.classElement import Elements
 from solver.classLoad import Loads
@@ -29,12 +30,6 @@ from solver.Condition import Conditions
 from solver.DataIO import ReadInput, resultTruss2d, summaryInputData
 from solver.Node import Nodes
 from solver.StrData import StructuralData
-
-sip.setapi('QString', 2)
-
-
-
-
 
 ################################################################################
 # Mayavi Part

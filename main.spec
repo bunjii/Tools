@@ -1,14 +1,13 @@
 # -*- mode: python -*-
 
-import requests
-
-requests_base_dir = os.path.dirname(requests.__file__)
-requests_tree = Tree(requests_base_dir, prefix='requests')
 block_cipher = None
 
+import sys 
+myLibPath = './solver'
+sys.path.append(myLibPath)
 
 a = Analysis(['main.py'],
-             pathex=['D:\\Users\\92245\\Desktop\\tools07', 'D:\\Users\\92245\\Desktop\\tools07\\solver'],
+             pathex=['C:\\Users\\bunji\\Desktop\\gitshare\\Tools\\solver'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -32,9 +31,6 @@ coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
                a.datas,
-               icon_tree,
-               data_tree,
-               astropy_tree,requests_tree,
-               strip=None,
+               strip=False,
                upx=True,
-               name=vaex.__build_name__)
+               name='main')
