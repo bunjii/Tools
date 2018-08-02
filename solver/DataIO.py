@@ -169,6 +169,73 @@ def readInput3dTruss(filename, _nodes, _elements, _materials,
             
         else: continue
 
+def WriteInputData(filepath, _strdata):
+    
+    _nodes = _strdata.Nodes
+    _elements = _strdata.Elems
+    _materials = _strdata.Mats
+    _sectionTypes = _strdata.Secs
+    _constraints = _strdata.Consts
+    _loads = _strdata.Loads
+    _conds = _strdata.Conds
+
+    # header -- date and filename
+    filenameAbs = os.path.abspath(filename)
+    outputName = 'input_'+filename
+    f = open(outputName, 'w')
+    
+    f.write('# --- HEADER ---\n')
+    f.write('\n')
+    f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now()))
+    f.write('\n')
+    f.write('# INPUT SOURCE: ' + filenameAbs + '\n')
+    f.write('# NUMBER OF NODES: ' + str(len(_nodes.nodes)) +'\n')
+    f.write('# NUMBER OF ELEMENTS: ' + str(len(_elements.elements)) +'\n')
+    f.write('# NUMBER OF FIXED NODES: ' + str(len(_constraints.constraints)) +'\n') 
+    f.write('# NUMBER OF LOADED NODES: ' + str(len(_loads.loads)) +'\n')
+    f.write('\n')
+    
+    # node info
+    f.write('# --- NODE ---\n')
+    f.write('#        ID,          X,          Y')
+    f.write(_nodes.outputNodesInfo())
+    f.write('\n\n')
+
+    # element info
+    f.write('# --- ELEMENT ---\n')
+    f.write('#        ID,    N1,    N2, MATID, SECID,     LENGTH,        SIN,        COS, LOC. STIFF')
+    f.write(_elements.outputElemsInfo())
+    f.write('\n\n')
+    
+    # material
+    f.write('# --- MATERIAL ---\n')
+    f.write('#        ID,  NAME,          E')
+    f.write(_materials.outputMaterialsInfo())
+    f.write('\n\n')  
+    
+    # section types
+    f.write('# --- SECTION ---\n')
+    f.write('#        ID,       AREA, MOM. INERT')
+    f.write(_sectionTypes.outputSectionsInfo())
+    f.write('\n\n')
+   
+    # constraintsStansted
+    f.write('# --- CONSTRAINTS (0:FREE, 1:FIXED) ---\n')
+    f.write('#        ID,   NID,     X,     Y')
+    f.write(_constraints.outputConstraintsInfo())
+    f.write('\n\n')
+    
+    # loads
+    f.write('# --- LOADS ---\n')
+    f.write('#        ID,   NID,          X,          Y')
+    f.write(_loads.outputLoadsInfo())
+    f.write('\n\n')
+    
+    # end of the input data
+    f.write('<END OF INPUT DATA> ' + str(datetime.datetime.now()))
+    
+    f.close()
+
 def summaryInputData(filename, _nodes, _elements, _materials,
                      _sectionTypes, _constraints, _loads):
     

@@ -1,6 +1,8 @@
-__pycache*
+__pycache__/*
+./solver/__pycache__/*
 .idea
 .vs
 .vscode
 build/*
 dist/*
+.*

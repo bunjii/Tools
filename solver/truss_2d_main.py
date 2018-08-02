@@ -45,7 +45,7 @@ elms.appendElementStiffnessMatrix2d()
 ns.appendLoad(lds)
 
 #elms.outputElemsStiffness()
-summaryInputData(inputfilename, ns, elms, mts, secs, consts, lds)
+# summaryInputData(inputfilename, ns, elms, mts, secs, consts, lds)
 # print (elms.outputElemsStiffness())
 
 K = createStiffnessMatrix2d(ns, elms, consts)

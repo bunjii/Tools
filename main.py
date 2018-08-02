@@ -27,7 +27,7 @@ from solver.classSolve import (createLoadVector2d, createStiffnessMatrix2d,
                                obtainDefVector, obtainInverseMatrix,
                                obtainNormalForceStressStrain)
 from solver.Condition import Conditions
-from solver.DataIO import ReadInput, resultTruss2d, summaryInputData
+from solver.DataIO import ReadInput, resultTruss2d, summaryInputData, WriteInputData
 from solver.Node import Nodes
 from solver.StrData import StructuralData
 
@@ -142,35 +142,38 @@ class MyMainWindow(QMainWindow):
 
         self.window_title = "Structural Tools V.0.1"
         self.container = QWidget()
-        self.layout = QGridLayout(self.container)
+        self.gridlayout = QGridLayout(self.container)
 
         self.setCentralWidget(self.container)
         self.setWindowTitle(self.window_title)
         self.resize(1200, 800)
 
         # left area
-        self.leftarea = QWidget(self.container)
-        self.leftarea.setFixedWidth(600) #.resize(600, 800)
-        self.leftarea.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
-        # left area tab
-        self.tabs = QTabWidget(self.leftarea)
-        self.tabs.setFixedWidth(580)
-        self.tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.tabs.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
-        self.tab1 = QLineEdit(self.tabs)
-        self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.tab2 = QWidget()
-        self.tabs.addTab(self.tab1, "TEXT")
-        self.tabs.addTab(self.tab2, "ELSE")
-
+        # self.leftarea = QWidget(self.container)
         
-
+        #leftarea = QWidget()
+        #leftarea.setFixedWidth(600)
+        #leftarea.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
+        
+        # left area tab
+        # tabs = QTabWidget(leftarea)
+        tabs = QTabWidget()
+        tabs.setFixedWidth(580)
+        tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        tab1 = QLineEdit(tabs)
+        # tab1.resize(580,1000)
+        tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        tab2 = QWidget()
+        tabs.addTab(tab1, "TEXT")
+        tabs.addTab(tab2, "ELSE")
+        
         # right area
-        self.mayavi_widget = MayaviQWidget(self.container)
+        # self.mayavi_widget = MayaviQWidget(self.container)
+        self.mayavi_widget = MayaviQWidget()
 
-        # register to layout
-        self.layout.addWidget(self.leftarea, 0, 0)
-        self.layout.addWidget(self.mayavi_widget, 0, 1)
+        # register right/left area to gridlayout
+        self.gridlayout.addWidget(tabs, 0, 0)
+        self.gridlayout.addWidget(self.mayavi_widget, 0, 1)
 
         # menubar
         menubar = self.menuBar()
@@ -209,14 +212,19 @@ class MyMainWindow(QMainWindow):
     def show_open_dialog(self):
         self.fname = QFileDialog.getOpenFileName(
             self, 'select input data file', '/home', "Data file (*.dat)")
-
+        
         if not self.fname[0]:
             pass
 
         f = open(self.fname[0], 'r')
         self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
- 
+        
         ReadInput(f.readlines(), data)
+        f.close()
+        filename = self.fname[0]
+        print(filename)
+        WriteInputData(filename, data)
+        f.close()
         self.mayavi_widget.visualization.plot_model_geometry(data)                
 
 ################################################################################
