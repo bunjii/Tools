@@ -142,9 +142,9 @@ class MyMainWindow(QMainWindow):
         self.window_title = "Structural Tools V.0.1"
         self.container = QWidget()
         self.gridlayout = QGridLayout(self.container)
-
         self.setCentralWidget(self.container)
         self.setWindowTitle(self.window_title)
+        self.statusBar().showMessage("READY")
         self.resize(1200, 800)
 
         # left area
@@ -176,7 +176,7 @@ class MyMainWindow(QMainWindow):
 
         # "file" actions
         ## import data
-        import_action = QAction('Import data', self)
+        import_action = QAction('Open input file', self)
         import_action.setShortcut('Ctrl+O')
         import_action.triggered.connect(self.show_open_dialog)
 
@@ -195,7 +195,9 @@ class MyMainWindow(QMainWindow):
         view_xy_action.triggered.connect(self.mayavi_widget.visualization.reset_view_xy)
 
         # "solve" actions
-        # solve
+        solve_action = QAction('&Solve', self)
+        solve_action.setShortcut('F5')
+        solve_action.triggered.connect(self.Solve)
 
         # register actions to menu
         file_menu.addAction(import_action)
@@ -205,9 +207,14 @@ class MyMainWindow(QMainWindow):
         edit_menu.addAction(import_action)
         
         view_menu.addAction(view_xy_action)
-        solve_menu.addAction(close_action)
+
+        solve_menu.addAction(solve_action)
         
         self.show()
+
+    def Solve(self):
+        print("solve function executed")
+        pass
 
     def save_file(self):
         print("save_file")
@@ -218,11 +225,12 @@ class MyMainWindow(QMainWindow):
             self, 'select input data file', '/home', "Data file (*.dat)")
         
         if not self.fname[0]:
-            pass
+            return
 
         f = open(self.fname[0], 'r')
+
         self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
-        
+    
         data.ResetStrData()
         ReadInput(f.readlines(), data)
         f.close()
@@ -232,7 +240,7 @@ class MyMainWindow(QMainWindow):
         filepath = self.fname[0]
         tab1txt = WriteInputData2(data)
         self.write_input_text(tab1txt)
-    
+
     def write_input_text(self, _txt):
         font = QtGui.QFont()
         font.setStyleHint(QFont().Monospace)

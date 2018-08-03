@@ -98,7 +98,7 @@ def ReadInput(_filelines, _strdata):
         elif lines[i].startswith('a') or lines[i].startswith('ATYP'):
             # print(_conds.AnalysisType)
             items = lines[i].split(',')
-            _conds.AnalysisType = items[1]
+            _conds.AnalysisType = int(items[1])
             # print (_conds.AnalysisType)
 
         else: continue
