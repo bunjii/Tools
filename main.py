@@ -6,12 +6,12 @@ from mayavi import mlab
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtWidgets import (QAction, QApplication, QBoxLayout, QDesktopWidget,
                              QFileDialog, QGridLayout, QHBoxLayout, QLabel,
                              QLineEdit, QMainWindow, QMenu, QMessageBox,
                              QPushButton, QSizePolicy, QTabWidget, QTextEdit,
-                             QVBoxLayout, QWidget, qApp)
+                             QVBoxLayout, QWidget, QPlainTextEdit , qApp)
 from traits.api import Button, HasTraits, Instance, on_trait_change
 from traitsui.api import Group, HSplit, Item, View
 from tvtk.pyface.api import Scene
@@ -27,7 +27,7 @@ from solver.classSolve import (createLoadVector2d, createStiffnessMatrix2d,
                                obtainDefVector, obtainInverseMatrix,
                                obtainNormalForceStressStrain)
 from solver.Condition import Conditions
-from solver.DataIO import ReadInput, resultTruss2d, summaryInputData, WriteInputData
+from solver.DataIO import ReadInput, resultTruss2d, summaryInputData, WriteInputData2
 from solver.Node import Nodes
 from solver.StrData import StructuralData
 
@@ -46,7 +46,6 @@ class MyVisuClass(HasTraits):
     def redraw_scene(self):
         mlab.clf(figure=self.scene.mayavi_scene)
         mlab.figure(figure=self.scene.mayavi_scene, bgcolor=(0.15, 0.15, 0.15))
-
 
     def plot_model_geometry(self, _strdata):
         mlab.clf(figure=self.scene.mayavi_scene) 
@@ -149,26 +148,18 @@ class MyMainWindow(QMainWindow):
         self.resize(1200, 800)
 
         # left area
-        # self.leftarea = QWidget(self.container)
-        
-        #leftarea = QWidget()
-        #leftarea.setFixedWidth(600)
-        #leftarea.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.MinimumExpanding)
-        
         # left area tab
-        # tabs = QTabWidget(leftarea)
         tabs = QTabWidget()
         tabs.setFixedWidth(580)
         tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        tab1 = QLineEdit(tabs)
-        # tab1.resize(580,1000)
-        tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        tab2 = QWidget()
-        tabs.addTab(tab1, "TEXT")
-        tabs.addTab(tab2, "ELSE")
+        self.tab1 = QPlainTextEdit(tabs)
+        # tab1.setText("HW \n HW")
+        self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.tab2 = QWidget()
+        tabs.addTab(self.tab1, "INPUT")
+        tabs.addTab(self.tab2, "OUTPUT")
         
         # right area
-        # self.mayavi_widget = MayaviQWidget(self.container)
         self.mayavi_widget = MayaviQWidget()
 
         # register right/left area to gridlayout
@@ -184,9 +175,15 @@ class MyMainWindow(QMainWindow):
         solve_menu = menubar.addMenu('&Solve')
 
         # "file" actions
+        ## import data
         import_action = QAction('Import data', self)
         import_action.setShortcut('Ctrl+O')
         import_action.triggered.connect(self.show_open_dialog)
+
+        ## save input data
+        save_action  = QAction('Save input file', self)
+        save_action.setShortcut('Ctrl+S')
+        save_action.triggered.connect(self.save_file)
 
         close_action = QAction('&Close', self)
         close_action.setShortcut('Alt+F4')
@@ -202,12 +199,19 @@ class MyMainWindow(QMainWindow):
 
         # register actions to menu
         file_menu.addAction(import_action)
+        file_menu.addAction(save_action)
         file_menu.addAction(close_action)
+
         edit_menu.addAction(import_action)
+        
         view_menu.addAction(view_xy_action)
         solve_menu.addAction(close_action)
         
         self.show()
+
+    def save_file(self):
+        print("save_file")
+        pass
 
     def show_open_dialog(self):
         self.fname = QFileDialog.getOpenFileName(
@@ -219,13 +223,22 @@ class MyMainWindow(QMainWindow):
         f = open(self.fname[0], 'r')
         self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
         
+        data.ResetStrData()
         ReadInput(f.readlines(), data)
         f.close()
-        filename = self.fname[0]
-        print(filename)
-        WriteInputData(filename, data)
-        f.close()
-        self.mayavi_widget.visualization.plot_model_geometry(data)                
+
+        self.mayavi_widget.visualization.plot_model_geometry(data)  
+
+        filepath = self.fname[0]
+        tab1txt = WriteInputData2(data)
+        self.write_input_text(tab1txt)
+    
+    def write_input_text(self, _txt):
+        font = QtGui.QFont()
+        font.setStyleHint(QFont().Monospace)
+        font.setFamily("Monospace")
+        self.tab1.setFont(font)
+        self.tab1.setPlainText(_txt)
 
 ################################################################################
 # STRUCTURAL MODEL
@@ -245,7 +258,6 @@ def SetStrData():
     str_data = StructuralData(nds, elms, mts, secs, consts, lds, conds)
 
     return str_data
-
 
 ################################################################################
 # MAIN

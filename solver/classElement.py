@@ -125,7 +125,7 @@ class Elements(object):
                 for k in range(j,6):
                     ke[j,k] = ke[k,j]
             
-            print (ke)
+            # print (ke)
             
             for j in range(0,3):
                 for k in range(0,3):
@@ -201,11 +201,12 @@ class Elements(object):
                 "{0: >5}".format(self.elements[i].n1), \
                 "{0: >5}".format(self.elements[i].n2), \
                 "{0: >5}".format(self.elements[i].matNo), \
-                "{0: >5}".format(self.elements[i].secNo), \
-                "{0:10.3f}".format(self.elements[i].elemLength), \
-                "{0:10.3f}".format(self.elements[i].sinElem), \
-                "{0:10.3f}".format(self.elements[i].cosElem), \
-                "{0:10.3f}".format(self.elements[i].localStiffness)])])
+                "{0: >5}".format(self.elements[i].secNo) ])])
+                # "{0:10.3f}".format(self.elements[i].elemLength), \
+                # "{0:10.3f}".format(self.elements[i].sinElem), \
+                # "{0:10.3f}".format(self.elements[i].cosElem), \
+                # "{0:10.3f}".format(self.elements[i].localStiffness)
+                
         return _templines
 
     def outputElemsResult(self):
@@ -221,7 +222,7 @@ class Elements(object):
     def outputElemsStiffness(self):
         for i in range(len(self.elements)):
             _temp = self.elements[i].elemStiffness
-            print (_temp)
+            # print (_temp)
         return 
     
     

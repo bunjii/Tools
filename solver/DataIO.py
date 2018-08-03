@@ -54,6 +54,7 @@ def ReadInput(filename, _nodes, _elements, _materials,
 """
 
 def ReadInput(_filelines, _strdata):
+
     lines = _filelines
     _nodes = _strdata.Nodes
     _elements = _strdata.Elems
@@ -63,41 +64,42 @@ def ReadInput(_filelines, _strdata):
     _loads = _strdata.Loads
     _conds = _strdata.Conds
 
-
     for i in range(len(lines)):
         items = []
         if lines[i].startswith('#'):
             continue
         # node id, x, y
-        elif lines[i].startswith('n') or lines[i].startswith('N'):
+        elif lines[i].startswith('n') or lines[i].startswith('N') or lines[i].startswith('NODE'):
             items = lines[i].split(',')
             _nodes.append_node(int(items[1]), float(items[2]), float(items[3]))
         # element id, n1, n2, material type, section type
-        elif lines[i].startswith('elem'):
+        elif lines[i].startswith('e') or lines[i].startswith('elem') or lines[i].startswith('ELEM'):
             items = lines[i].split(',')
             _elements.appendElement( \
             int(items[1]), int(items[2]), int(items[3]), int(items[4]), int(items[5]))
         # material id, name, e-module
-        elif lines[i].startswith('mat'):
+        elif lines[i].startswith('mat') or lines[i].startswith('MAT'):
             items = lines[i].split(',')
             _materials.appendMaterial(int(items[1]), str(items[2].strip()), float(items[3]))
         # section id, area, moment of inertia
-        elif lines[i].startswith('sec'):
+        elif lines[i].startswith('sec') or lines[i].startswith('SEC'):
             items = lines[i].split(',')
             _secs.appendSection(int(items[1]), float(items[2]), float(items[3]))
         # constraint id, node id, condition x, condition y
-        elif lines[i].startswith('constr'):
+        elif lines[i].startswith('constr') or lines[i].startswith('CONS'):
             items = lines[i].split(',')
             _constraints.appendConstraint( \
             int(items[1]), int(items[2]), int(items[3]), int(items[4]))
         # load id, node id, load x, load y
-        elif lines[i].startswith('load'):
+        elif lines[i].startswith('load') or lines[i].startswith('LOAD'):
             items = lines[i].split(',')
             _loads.appendLoad(int(items[1]), int(items[2]), float(items[3]), float(items[4]))
 
-        elif lines[i].startswith('a'):
+        elif lines[i].startswith('a') or lines[i].startswith('ATYP'):
+            # print(_conds.AnalysisType)
             items = lines[i].split(',')
             _conds.AnalysisType = items[1]
+            # print (_conds.AnalysisType)
 
         else: continue
 
@@ -169,6 +171,8 @@ def readInput3dTruss(filename, _nodes, _elements, _materials,
             
         else: continue
 
+# Writing functions
+
 def WriteInputData(filepath, _strdata):
     
     _nodes = _strdata.Nodes
@@ -178,23 +182,28 @@ def WriteInputData(filepath, _strdata):
     _constraints = _strdata.Consts
     _loads = _strdata.Loads
     _conds = _strdata.Conds
+   #  print(_conds.AnalysisType)
 
     # header -- date and filename
-    filenameAbs = os.path.abspath(filename)
-    outputName = 'input_'+filename
-    f = open(outputName, 'w')
-    
+    f = open(filepath, 'w')
     f.write('# --- HEADER ---\n')
     f.write('\n')
     f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now()))
     f.write('\n')
-    f.write('# INPUT SOURCE: ' + filenameAbs + '\n')
+    f.write('# INPUT SOURCE: ' + filepath + '\n')
     f.write('# NUMBER OF NODES: ' + str(len(_nodes.nodes)) +'\n')
     f.write('# NUMBER OF ELEMENTS: ' + str(len(_elements.elements)) +'\n')
     f.write('# NUMBER OF FIXED NODES: ' + str(len(_constraints.constraints)) +'\n') 
     f.write('# NUMBER OF LOADED NODES: ' + str(len(_loads.loads)) +'\n')
     f.write('\n')
     
+    # analysis type
+    f.write('# TYPE OF ANALYSIS \n')
+    f.write('# (1: LINEAR STATIC, 2D TRUSS) \n')
+    f.write('#        ID')
+    f.write(_conds.OutputConditions())
+    f.write('\n\n')
+
     # node info
     f.write('# --- NODE ---\n')
     f.write('#        ID,          X,          Y')
@@ -203,7 +212,7 @@ def WriteInputData(filepath, _strdata):
 
     # element info
     f.write('# --- ELEMENT ---\n')
-    f.write('#        ID,    N1,    N2, MATID, SECID,     LENGTH,        SIN,        COS, LOC. STIFF')
+    f.write('#        ID,    N1,    N2, MATID, SECID')
     f.write(_elements.outputElemsInfo())
     f.write('\n\n')
     
@@ -236,6 +245,77 @@ def WriteInputData(filepath, _strdata):
     
     f.close()
 
+def WriteInputData2(_strdata):
+    
+    _nodes = _strdata.Nodes
+    _elements = _strdata.Elems
+    _materials = _strdata.Mats
+    _sectionTypes = _strdata.Secs
+    _constraints = _strdata.Consts
+    _loads = _strdata.Loads
+    _conds = _strdata.Conds
+
+    _tmplns = ""
+
+    # header -- date and filename
+    _tmplns += '# --- HEADER ---\n'
+    _tmplns += '\n'
+    _tmplns += '# ANALYSIS DATE: ' + str(datetime.datetime.now())
+    _tmplns += '\n'
+    _tmplns += '# NUMBER OF NODES: ' + str(len(_nodes.nodes)) +'\n'
+    _tmplns += '# NUMBER OF ELEMENTS: ' + str(len(_elements.elements)) +'\n'
+    _tmplns += '# NUMBER OF FIXED NODES: ' + str(len(_constraints.constraints)) +'\n'
+    _tmplns += '# NUMBER OF LOADED NODES: ' + str(len(_loads.loads)) +'\n'
+    _tmplns += '\n'
+    
+    # analysis type
+    _tmplns += '# TYPE OF ANALYSIS \n'
+    _tmplns += '# (1: LINEAR STATIC, 2D TRUSS) \n'
+    _tmplns += '#        ID'
+    _tmplns += _conds.OutputConditions()
+    _tmplns += '\n\n'
+
+    # node info
+    _tmplns += '# --- NODE ---\n'
+    _tmplns += '#        ID,          X,          Y'
+    _tmplns += _nodes.outputNodesInfo()
+    _tmplns += '\n\n'
+
+    # element info
+    _tmplns += '# --- ELEMENT ---\n'
+    _tmplns += '#        ID,    N1,    N2, MATID, SECID'
+    _tmplns += _elements.outputElemsInfo()
+    _tmplns += '\n\n'
+    
+    # material
+    _tmplns += '# --- MATERIAL ---\n'
+    _tmplns += '#        ID,  NAME,          E'
+    _tmplns += _materials.outputMaterialsInfo()
+    _tmplns += '\n\n'
+    
+    # section types
+    _tmplns += '# --- SECTION ---\n'
+    _tmplns += '#        ID,       AREA, MOM. INERT'
+    _tmplns += _sectionTypes.outputSectionsInfo()
+    _tmplns += '\n\n'
+   
+    # constraintsStansted
+    _tmplns += '# --- CONSTRAINTS (0:FREE, 1:FIXED) ---\n'
+    _tmplns += '#        ID,   NID,     X,     Y'
+    _tmplns += _constraints.outputConstraintsInfo()
+    _tmplns += '\n\n'
+    
+    # loads
+    _tmplns += '# --- LOADS ---\n'
+    _tmplns += '#        ID,   NID,          X,          Y'
+    _tmplns += _loads.outputLoadsInfo()
+    _tmplns += '\n\n'
+    
+    # end of the input data
+    _tmplns += '<END OF INPUT DATA> ' + str(datetime.datetime.now())
+    
+    return _tmplns
+
 def summaryInputData(filename, _nodes, _elements, _materials,
                      _sectionTypes, _constraints, _loads):
     
@@ -263,7 +343,7 @@ def summaryInputData(filename, _nodes, _elements, _materials,
 
     # element info
     f.write('# --- ELEMENT ---\n')
-    f.write('#        ID,    N1,    N2, MATID, SECID,     LENGTH,        SIN,        COS, LOC. STIFF')
+    f.write('#        ID,    N1,    N2, MATID, SECID')
     f.write(_elements.outputElemsInfo())
     f.write('\n\n')
     
