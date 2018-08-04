@@ -26,6 +26,13 @@ class Node(object):
         d = math.sqrt((self.x-_other.x)**2+(self.y-_other.y)**2)
         return d
 
+    @staticmethod
+    def getMidPointCoordinates(_n1, _n2):
+        tx = (_n1.x+_n2.x)/2
+        ty = (_n1.y+_n2.y)/2
+        return [tx, ty]
+
+
 class Node3d(object):
 
     def __init__(self, _id, _x, _y, _z):
@@ -49,6 +56,13 @@ class Node3d(object):
     def getDistance3d(self, _other):
         d = math.sqrt((self.x-_other.x)**2+(self.y-_other.y)**2+(self.z-_other.z)**2)
         return d
+    
+    @staticmethod
+    def getMidPointCoordinates(_n1, _n2):
+        tx = (_n1.x+_n2.x)/2
+        ty = (_n1.y+_n2.y)/2
+        tz = (_n1.z+_n2.z)/2 
+        return [tx, ty, tz]
 
 class Nodes(object):
     """

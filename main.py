@@ -28,7 +28,7 @@ from solver.classSolve import (createLoadVector2d, createStiffnessMatrix2d,
                                obtainNormalForceStressStrain)
 from solver.Condition import Conditions
 from solver.DataIO import ReadInput, resultTruss2d, summaryInputData, WriteInputData2
-from solver.Node import Nodes
+from solver.Node import Nodes, Node
 from solver.StrData import StructuralData
 
 ################################################################################
@@ -39,10 +39,15 @@ class MyVisuClass(HasTraits):
 
     scene = Instance(MlabSceneModel, ())
     # the layout of the dialog created
+    """
     view = View(Item('scene', editor=SceneEditor(scene_class=Scene),
                      height=250, width=300, show_label=False),
                 resizable=True )  # We need this to resize with the parent widget
-               
+    """
+    view = View(Item('scene', editor=SceneEditor(),
+                    height=250, width=300, show_label=False),
+                resizable=True)  # We need this to resize with the parent widget
+
     def redraw_scene(self):
         mlab.clf(figure=self.scene.mayavi_scene)
         mlab.figure(figure=self.scene.mayavi_scene, bgcolor=(0.15, 0.15, 0.15))
@@ -50,31 +55,52 @@ class MyVisuClass(HasTraits):
     def plot_model_geometry(self, _strdata):
         mlab.clf(figure=self.scene.mayavi_scene) 
         # mlab.axes(x_axis_visibility=True, y_axis_visibility=True, z_axis_visibility=True)
-        
+
         # node
         nodes = _strdata.Nodes.nodes
         num_node = len(nodes)
         xlist = []
         ylist = []
         zlist = []
+        nidList = []
         for i in range(len(nodes)):
             xlist.append(nodes[i].x)
             ylist.append(nodes[i].y)
             # zlist.append(nodes[i].z)
+            nidList.append(str(nodes[i].id))
         x = np.array(xlist)
         y = np.array(ylist)
         z = np.zeros(num_node) # zero element for 2d analysis
 
-        mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, resolution=64, scale_factor=0.2)
+        mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, resolution=64, scale_factor=0.07)
+        
+        nodeText = []
+        for i in range(len(nodes)):
+            x = xlist[i]
+            y = ylist[i]
+            # z = zlist[i]
+            nodeText.append(mlab.text3d(
+                x, y, 0, "N"+nidList[i], figure=self.scene.mayavi_scene, scale=0.1, color=(0.7, 0.7, 0.7)))
+        #mlab.show()
 
         # elem
         elems = _strdata.Elems.elements
         num_elem = len(elems)
 
+        elemText = []
         for i in range(num_elem):
             n1 = elems[i].n1
             n2 = elems[i].n2
             self.LinePlot(n1, n2, _strdata.Nodes)
+            
+            midpt = Node.getMidPointCoordinates(_strdata.Nodes.findNodeById(n1.id),
+                                                _strdata.Nodes  .findNodeById(n2.id))
+            print (midpt)
+            # elemText.append(elems[i].id)
+
+
+        # elem text
+        
         
         # loads
         loads = _strdata.Loads.loads
@@ -85,7 +111,6 @@ class MyVisuClass(HasTraits):
         # global axes
         mlab.orientation_axes(figure=self.scene.mayavi_scene, opacity=1.0, line_width=1.0)  
 
-    
     def show_load_vec(self, _load, _strdata):
         # loads
         nd = _strdata.Nodes.findNodeById(_load.nodeId)
@@ -108,7 +133,8 @@ class MyVisuClass(HasTraits):
     def LinePlot(_sid, _eid, _nodes):
         spt = _nodes.findNodeById(_sid)
         ept = _nodes.findNodeById(_eid)
-        mlab.plot3d([spt.x, ept.x],[spt.y,ept.y],[0.0,0.0])
+        mlab.plot3d([spt.x, ept.x], [spt.y, ept.y], [0.0, 0.0], 
+                                 line_width=2.0, opacity=1.0, tube_radius=None)
 
 ################################################################################
 # The QWidget containing the visualization, this is pure PyQt4 code.
@@ -217,7 +243,9 @@ class MyMainWindow(QMainWindow):
         pass
 
     def save_file(self):
+        # retrieve what's written in the text tab
         print("save_file")
+        # write down to a file (overwrite caution?)
         pass
 
     def show_open_dialog(self):
@@ -242,9 +270,9 @@ class MyMainWindow(QMainWindow):
         self.write_input_text(tab1txt)
 
     def write_input_text(self, _txt):
-        font = QtGui.QFont()
-        font.setStyleHint(QFont().Monospace)
-        font.setFamily("Monospace")
+        font = QtGui.QFont("courier")
+        #font.setFamily("monospace")
+        #font.setStyleHint(QFont().Monospace)
         self.tab1.setFont(font)
         self.tab1.setPlainText(_txt)
 
