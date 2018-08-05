@@ -93,8 +93,8 @@ class MyVisuClass(HasTraits):
             n2 = elems[i].n2
             self.LinePlot(n1, n2, _strdata.Nodes)
             
-            midpt = Node.getMidPointCoordinates(_strdata.Nodes.findNodeById(n1.id),
-                                                _strdata.Nodes  .findNodeById(n2.id))
+            midpt = Node.getMidPointCoordinates(_strdata.Nodes.findNodeById(n1).id,
+                                                _strdata.Nodes.findNodeById(n2).id)
             print (midpt)
             # elemText.append(elems[i].id)
 
