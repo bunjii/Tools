@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 
 import numpy as np
 from mayavi import mlab
@@ -54,7 +55,6 @@ class MyVisuClass(HasTraits):
 
     def plot_model_geometry(self, _strdata):
         mlab.clf(figure=self.scene.mayavi_scene) 
-        # mlab.axes(x_axis_visibility=True, y_axis_visibility=True, z_axis_visibility=True)
 
         # node
         nodes = _strdata.Nodes.nodes
@@ -97,10 +97,7 @@ class MyVisuClass(HasTraits):
             #                                    _strdata.Nodes.findNodeById(n2).id)
             #print (midpt)
             # elemText.append(elems[i].id)
-
-
         # elem text
-        
         
         # loads
         loads = _strdata.Loads.loads
@@ -175,21 +172,31 @@ class MyMainWindow(QMainWindow):
 
         # left area
         # left area tab
+        
         tabs = QTabWidget()
         tabs.setFixedWidth(580)
         tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        tabs2 = QTabWidget()
+        tabs2.setFixedWidth(580)
+        tabs2.setFixedHeight(180)
+        tabs2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        vtabbox = QVBoxLayout()
+        vtabbox.addWidget(tabs)
         self.tab1 = QPlainTextEdit(tabs)
-        # tab1.setText("HW \n HW")
         self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.tab2 = QWidget()
+        self.tab2 = QWidget(tabs)
+        self.tab3 = QPlainTextEdit(tabs2)
         tabs.addTab(self.tab1, "INPUT")
         tabs.addTab(self.tab2, "OUTPUT")
-        
+        tabs2.addTab(self.tab3, "CONSOLE")
+        vtabbox.addWidget(tabs2)
+
         # right area
         self.mayavi_widget = MayaviQWidget()
 
         # register right/left area to gridlayout
-        self.gridlayout.addWidget(tabs, 0, 0)
+        # self.gridlayout.addWidget(tabs, 0, 0)
+        self.gridlayout.addLayout(vtabbox, 0, 0)
         self.gridlayout.addWidget(self.mayavi_widget, 0, 1)
 
         # menubar
@@ -240,8 +247,8 @@ class MyMainWindow(QMainWindow):
         self.show()
 
     def Solve(self):
-        print("solve function executed")
-        pass
+        dts = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+        self.render_text(self.tab3, "Solve Executed: " + dts)
 
     def save_file(self):
         # retrieve what's written in the text tab
@@ -252,6 +259,7 @@ class MyMainWindow(QMainWindow):
             print("file destination not specified")
             pass
         else:
+            ### this is also unstable.
             f = open(self.fname[0],'w')
             f.write(lines)
             f.close()
@@ -275,18 +283,18 @@ class MyMainWindow(QMainWindow):
 
         filepath = self.fname[0]
         tab1txt = WriteInputData2(data)
-        self.show_input_text(tab1txt)
+        self.render_text(self.tab1, tab1txt)
         
 
-    def show_input_text(self, _txt):
+    def render_text(self, _widget, _txt):
         if os.name == 'nt': # windows
             font = QtGui.QFont("Monospace")
             font.setStyleHint(QFont().Monospace)
         else:
             font = QtGui.QFont("courier")
 
-        self.tab1.setFont(font)
-        self.tab1.setPlainText(_txt)
+        _widget.setFont(font)
+        _widget.setPlainText(_txt)
         self.statusBar().showMessage('READ')
 
 ################################################################################

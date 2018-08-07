@@ -188,7 +188,7 @@ def WriteInputData(filepath, _strdata):
     f = open(filepath, 'w')
     f.write('# --- HEADER ---\n')
     f.write('\n')
-    f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now()))
+    f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
     f.write('\n')
     f.write('# INPUT SOURCE: ' + filepath + '\n')
     f.write('# NUMBER OF NODES: ' + str(len(_nodes.nodes)) +'\n')
@@ -241,7 +241,7 @@ def WriteInputData(filepath, _strdata):
     f.write('\n\n')
     
     # end of the input data
-    f.write('<END OF INPUT DATA> ' + str(datetime.datetime.now()))
+    f.write('<END OF INPUT DATA> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
     
     f.close()
 
@@ -260,7 +260,7 @@ def WriteInputData2(_strdata):
     # header -- date and filename
     _tmplns += '# --- HEADER ---\n'
     _tmplns += '\n'
-    _tmplns += '# ANALYSIS DATE: ' + str(datetime.datetime.now())
+    _tmplns += '# ANALYSIS DATE: ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
     _tmplns += '\n'
     _tmplns += '# NUMBER OF NODES: ' + str(len(_nodes.nodes)) +'\n'
     _tmplns += '# NUMBER OF ELEMENTS: ' + str(len(_elements.elements)) +'\n'
@@ -312,7 +312,7 @@ def WriteInputData2(_strdata):
     _tmplns += '\n\n'
     
     # end of the input data
-    _tmplns += '<END OF INPUT DATA> ' + str(datetime.datetime.now())
+    _tmplns += '<END OF INPUT DATA> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
     
     return _tmplns
 
@@ -326,7 +326,7 @@ def summaryInputData(filename, _nodes, _elements, _materials,
     
     f.write('# --- HEADER ---\n')
     f.write('\n')
-    f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now()))
+    f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
     f.write('\n')
     f.write('# INPUT SOURCE: ' + filenameAbs + '\n')
     f.write('# NUMBER OF NODES: ' + str(len(_nodes.nodes)) +'\n')
