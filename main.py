@@ -93,9 +93,9 @@ class MyVisuClass(HasTraits):
             n2 = elems[i].n2
             self.LinePlot(n1, n2, _strdata.Nodes)
             
-            midpt = Node.getMidPointCoordinates(_strdata.Nodes.findNodeById(n1).id,
-                                                _strdata.Nodes.findNodeById(n2).id)
-            print (midpt)
+            #midpt = Node.getMidPointCoordinates(_strdata.Nodes.findNodeById(n1).id,
+            #                                    _strdata.Nodes.findNodeById(n2).id)
+            #print (midpt)
             # elemText.append(elems[i].id)
 
 
@@ -134,7 +134,7 @@ class MyVisuClass(HasTraits):
         spt = _nodes.findNodeById(_sid)
         ept = _nodes.findNodeById(_eid)
         mlab.plot3d([spt.x, ept.x], [spt.y, ept.y], [0.0, 0.0], 
-                                 line_width=2.0, opacity=1.0, tube_radius=None)
+                                 line_width=1.0, opacity=0.8, tube_radius=None)
 
 ################################################################################
 # The QWidget containing the visualization, this is pure PyQt4 code.
@@ -226,14 +226,15 @@ class MyMainWindow(QMainWindow):
         solve_action.triggered.connect(self.Solve)
 
         # register actions to menu
+        ## file
         file_menu.addAction(import_action)
         file_menu.addAction(save_action)
         file_menu.addAction(close_action)
-
+        ## edit
         edit_menu.addAction(import_action)
-        
+        ## view
         view_menu.addAction(view_xy_action)
-
+        ## solve
         solve_menu.addAction(solve_action)
         
         self.show()
@@ -244,9 +245,17 @@ class MyMainWindow(QMainWindow):
 
     def save_file(self):
         # retrieve what's written in the text tab
-        print("save_file")
+        lines = self.tab1.toPlainText()
         # write down to a file (overwrite caution?)
-        pass
+        if not self.fname: 
+            ### doesn't work here at the moment.
+            print("file destination not specified")
+            pass
+        else:
+            f = open(self.fname[0],'w')
+            f.write(lines)
+            f.close()
+            self.statusBar().showMessage('SAVED')
 
     def show_open_dialog(self):
         self.fname = QFileDialog.getOpenFileName(
@@ -256,7 +265,6 @@ class MyMainWindow(QMainWindow):
             return
 
         f = open(self.fname[0], 'r')
-
         self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
     
         data.ResetStrData()
@@ -267,14 +275,19 @@ class MyMainWindow(QMainWindow):
 
         filepath = self.fname[0]
         tab1txt = WriteInputData2(data)
-        self.write_input_text(tab1txt)
+        self.show_input_text(tab1txt)
+        
 
-    def write_input_text(self, _txt):
-        font = QtGui.QFont("courier")
-        #font.setFamily("monospace")
-        #font.setStyleHint(QFont().Monospace)
+    def show_input_text(self, _txt):
+        if os.name == 'nt': # windows
+            font = QtGui.QFont("Monospace")
+            font.setStyleHint(QFont().Monospace)
+        else:
+            font = QtGui.QFont("courier")
+
         self.tab1.setFont(font)
         self.tab1.setPlainText(_txt)
+        self.statusBar().showMessage('READ')
 
 ################################################################################
 # STRUCTURAL MODEL
