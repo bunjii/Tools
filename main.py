@@ -31,6 +31,7 @@ from solver.Condition import Conditions
 from solver.DataIO import ReadInput, resultTruss2d, summaryInputData, WriteInputData2
 from solver.Node import Nodes, Node
 from solver.StrData import StructuralData
+from solver.solve_2d_truss import solve_2d_truss
 
 ################################################################################
 # Mayavi Part
@@ -72,7 +73,7 @@ class MyVisuClass(HasTraits):
         y = np.array(ylist)
         z = np.zeros(num_node) # zero element for 2d analysis
 
-        mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, resolution=64, scale_factor=0.07)
+        mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, resolution=16, scale_factor=0.07)
         
         nodeText = []
         for i in range(len(nodes)):
@@ -247,8 +248,12 @@ class MyMainWindow(QMainWindow):
         self.show()
 
     def Solve(self):
-        dts = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-        self.render_text(self.tab3, "Solve Executed: " + dts)
+        dts = str(datetime.now()) #.strftime('%Y/%m/%d %H:%M:%S')
+        self.render_text(self.tab3, "Solve Executed: " + dts + "\n")
+        solve_2d_truss.truss2d(data)
+        dtf = str(datetime.now()) #.strftime('%Y/%m/%d %H:%M:%S')
+        self.tab3.insertPlainText("Solve Finished: " + dtf + "\n")
+        self.statusBar().showMessage('READY')
 
     def save_file(self):
         # retrieve what's written in the text tab
@@ -259,7 +264,7 @@ class MyMainWindow(QMainWindow):
             print("file destination not specified")
             pass
         else:
-            ### this is also unstable.
+            ### else is also unstable.
             f = open(self.fname[0],'w')
             f.write(lines)
             f.close()
@@ -272,6 +277,7 @@ class MyMainWindow(QMainWindow):
         if not self.fname[0]:
             return
 
+        print(self.fname[0])
         f = open(self.fname[0], 'r')
         self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
     
@@ -284,7 +290,6 @@ class MyMainWindow(QMainWindow):
         filepath = self.fname[0]
         tab1txt = WriteInputData2(data)
         self.render_text(self.tab1, tab1txt)
-        
 
     def render_text(self, _widget, _txt):
         if os.name == 'nt': # windows

@@ -432,7 +432,7 @@ def summaryInputData2dR(filename, _nodes, _elements, _materials,
     f.write('\n\n')
     
     # end of the input data
-    f.write('<end of the input data> ' + str(datetime.datetime.now()))
+    f.write('<end of the input data> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
     
     f.close()
     
@@ -493,7 +493,7 @@ def summaryInputData3dTruss(filename, _nodes, _elements, _materials,
     f.write('\n\n')
 
     # end of the input data
-    f.write('<end of the input data> ' + str(datetime.datetime.now()))
+    f.write('<end of the input data> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
 
     f.close()
     
@@ -524,7 +524,7 @@ def resultTruss2d(filename, _nodes, _elements):
     f.write('\n\n')
 
     # end of the input data
-    f.write('<END OF RESULT> ' + str(datetime.datetime.now()))
+    f.write('<END OF RESULT> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
 
     f.close()
     
