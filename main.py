@@ -7,7 +7,7 @@ from mayavi import mlab
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon, QFont, QTextCursor
 from PyQt5.QtWidgets import (QAction, QApplication, QBoxLayout, QDesktopWidget,
                              QFileDialog, QGridLayout, QHBoxLayout, QLabel,
                              QLineEdit, QMainWindow, QMenu, QMessageBox,
@@ -81,9 +81,10 @@ class MyVisuClass(HasTraits):
             y = ylist[i]
             # z = zlist[i]
             nodeText.append(mlab.text3d(
-                x, y, 0, "N"+nidList[i], figure=self.scene.mayavi_scene, scale=0.1, color=(0.7, 0.7, 0.7)))
+                x, y, 0, "N"+nidList[i], figure=self.scene.mayavi_scene, 
+                scale=0.1, color=(0.7, 0.7, 0.7)))
         #mlab.show()
-
+        # mlab.pipeline.
         # elem
         elems = _strdata.Elems.elements
         num_elem = len(elems)
@@ -126,6 +127,9 @@ class MyVisuClass(HasTraits):
     
     def reset_view_xy(self):
         mlab.view(0,0)
+
+    def showpip(self):
+        mlab.show_pipeline()
 
     @staticmethod
     def LinePlot(_sid, _eid, _nodes):
@@ -223,6 +227,11 @@ class MyMainWindow(QMainWindow):
         close_action.setShortcut('Alt+F4')
         close_action.triggered.connect(self.close)
 
+        # "edit" actions
+        show_pipeline_action = QAction('&Show pipeline', self)
+        show_pipeline_action.setShortcut('Ctrl+O')
+        show_pipeline_action.triggered.connect(self.mayavi_widget.visualization.showpip)
+
         # "view" actions
         view_xy_action = QAction('&XY plane', self)
         view_xy_action.setShortcut('Ctrl+1')
@@ -239,7 +248,7 @@ class MyMainWindow(QMainWindow):
         file_menu.addAction(save_action)
         file_menu.addAction(close_action)
         ## edit
-        edit_menu.addAction(import_action)
+        edit_menu.addAction(show_pipeline_action)
         ## view
         view_menu.addAction(view_xy_action)
         ## solve
