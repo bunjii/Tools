@@ -229,7 +229,7 @@ class MyMainWindow(QMainWindow):
 
         # "edit" actions
         show_pipeline_action = QAction('&Show pipeline', self)
-        show_pipeline_action.setShortcut('Ctrl+O')
+        show_pipeline_action.setShortcut('Ctrl+P')
         show_pipeline_action.triggered.connect(self.mayavi_widget.visualization.showpip)
 
         # "view" actions
@@ -261,6 +261,7 @@ class MyMainWindow(QMainWindow):
         self.render_text(self.tab3, "Solve Executed: " + dts + "\n")
         solve_2d_truss.truss2d(data)
         dtf = str(datetime.now()) #.strftime('%Y/%m/%d %H:%M:%S')
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
         self.tab3.insertPlainText("Solve Finished: " + dtf + "\n")
         self.statusBar().showMessage('READY')
 
