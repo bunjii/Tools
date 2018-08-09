@@ -49,6 +49,8 @@ class MyVisuClass(HasTraits):
     view = View(Item('scene', editor=SceneEditor(),
                     height=250, width=300, show_label=False),
                 resizable=True)  # We need this to resize with the parent widget
+    
+    tgl_nid = False
 
     def redraw_scene(self):
         mlab.clf(figure=self.scene.mayavi_scene)
@@ -79,13 +81,11 @@ class MyVisuClass(HasTraits):
         for i in range(len(nodes)):
             x = xlist[i]
             y = ylist[i]
-            # z = zlist[i]
             nodeText.append(mlab.text3d(
                 x, y, 0, "N"+nidList[i], figure=self.scene.mayavi_scene, 
                 scale=0.1, color=(0.7, 0.7, 0.7)))
-        #mlab.show()
-        # mlab.pipeline.
-        # elem
+            nodeText[-1].visible == False
+
         elems = _strdata.Elems.elements
         num_elem = len(elems)
 
@@ -130,6 +130,11 @@ class MyVisuClass(HasTraits):
 
     def showpip(self):
         mlab.show_pipeline()
+    
+    def toggle_nid(self):
+        
+        #if tgl_nid == False:
+        #    pass
 
     @staticmethod
     def LinePlot(_sid, _eid, _nodes):
@@ -237,6 +242,10 @@ class MyMainWindow(QMainWindow):
         view_xy_action.setShortcut('Ctrl+1')
         view_xy_action.triggered.connect(self.mayavi_widget.visualization.reset_view_xy)
 
+        view_nodeid_action = QAction('&Toggle node ID', self)
+        view_nodeid_action.setShortcut('Alt+N')
+        view_nodeid_action.triggered.connect(self.mayavi_widget.visualization.toggle_nid)
+
         # "solve" actions
         solve_action = QAction('&Solve', self)
         solve_action.setShortcut('F5')
@@ -251,6 +260,7 @@ class MyMainWindow(QMainWindow):
         edit_menu.addAction(show_pipeline_action)
         ## view
         view_menu.addAction(view_xy_action)
+        view_menu.addAction(view_nodeid_action)
         ## solve
         solve_menu.addAction(solve_action)
         
