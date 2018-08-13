@@ -134,7 +134,7 @@ class MyVisuClass(HasTraits):
     def toggle_nid(self):
         
         #if tgl_nid == False:
-        #    pass
+        pass
 
     @staticmethod
     def LinePlot(_sid, _eid, _nodes):
