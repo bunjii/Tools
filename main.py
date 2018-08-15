@@ -39,18 +39,18 @@ from solver.solve_2d_truss import solve_2d_truss
 
 class MyVisuClass(HasTraits):
 
+    # def __init__(self):
+
     scene = Instance(MlabSceneModel, ())
     # the layout of the dialog created
     """
     view = View(Item('scene', editor=SceneEditor(scene_class=Scene),
-                     height=250, width=300, show_label=False),
+                    height=250, width=300, show_label=False),
                 resizable=True )  # We need this to resize with the parent widget
     """
     view = View(Item('scene', editor=SceneEditor(),
                     height=250, width=300, show_label=False),
                 resizable=True)  # We need this to resize with the parent widget
-    
-    tgl_nid = False
 
     def redraw_scene(self):
         mlab.clf(figure=self.scene.mayavi_scene)
@@ -75,7 +75,7 @@ class MyVisuClass(HasTraits):
         y = np.array(ylist)
         z = np.zeros(num_node) # zero element for 2d analysis
 
-        mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, resolution=16, scale_factor=0.07)
+        pts = mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, resolution=16, scale_factor=0.07)
         
         nodeText = []
         for i in range(len(nodes)):
@@ -132,9 +132,9 @@ class MyVisuClass(HasTraits):
         mlab.show_pipeline()
     
     def toggle_nid(self):
-        
-        #if tgl_nid == False:
-        #    pass
+        #pass
+        if window.tgl_nid == False:
+            print("false")
 
     @staticmethod
     def LinePlot(_sid, _eid, _nodes):
@@ -171,6 +171,8 @@ class MyMainWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
+
+        self.tgl_nid = False
 
         self.window_title = "Structural Tools V.0.1"
         self.container = QWidget()
