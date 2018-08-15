@@ -1,58 +1,85 @@
-# Author:  Gael Varoquaux <gael _dot_ varoquaux _at_ normalesup _dot_ org>
-# Copyright (c) 2009, Enthought, Inc.
+
+# Authors: Prabhu Ramachandran <prabhu [at] aero.iitb.ac.in>
+# Copyright (c) 2007, Enthought, Inc.
 # License: BSD Style.
 
-from traits.api import HasTraits, Instance, on_trait_change
-from traitsui.api import View, Group, Item
+# Standard imports.
+from numpy import sqrt, sin, mgrid
 
-from mayavi.core.api import Engine
-from mayavi.core.ui.api import MayaviScene, MlabSceneModel, \
-            SceneEditor
+# Enthought imports.
+from traits.api import HasTraits, Instance, Property, Enum
+from traitsui.api import View, Item, HSplit, VSplit, InstanceEditor
+from tvtk.pyface.scene_editor import SceneEditor
+from mayavi.core.ui.engine_view import EngineView
+from mayavi.tools.mlab_scene_model import MlabSceneModel
 
-################################################################################
-class MyApp(HasTraits):
 
-    # The first engine. As default arguments (an empty tuple) are given,
-    # traits initializes it.
-    engine1 = Instance(Engine, args=())
+######################################################################
+class Mayavi(HasTraits):
 
-    scene1 = Instance(MlabSceneModel)
+    # The scene model.
+    scene = Instance(MlabSceneModel, ())
 
-    def _scene1_default(self):
-        " The default initializer for 'scene1' "
-        self.engine1.start()
-        scene1 = MlabSceneModel(engine=self.engine1)
-        return scene1
+    # The mayavi engine view.
+    engine_view = Instance(EngineView)
 
-    engine2 = Instance(Engine, ())
+    # The current selection in the engine tree view.
+    current_selection = Property
 
-    scene2 = Instance(MlabSceneModel)
 
-    def _scene2_default(self):
-        " The default initializer for 'scene2' "
-        self.engine2.start()
-        scene2 = MlabSceneModel(engine=self.engine2)
-        return scene2
+    ######################
+    view = View(HSplit(VSplit(Item(name='engine_view',
+                                   style='custom',
+                                   resizable=True,
+                                   show_label=False
+                                   ),
+                              Item(name='current_selection',
+                                   editor=InstanceEditor(),
+                                   enabled_when='current_selection is not None',
+                                   style='custom',
+                                   springy=True,
+                                   show_label=False),
+                                   ),
+                               Item(name='scene',
+                                    editor=SceneEditor(),
+                                    show_label=False,
+                                    resizable=True,
+                                    height=500,
+                                    width=500),
+                        ),
+                resizable=True,
+                scrollable=True
+                )
 
-    # We populate the scenes only when it is activated, to avoid problems
-    # with VTK objects that expect an active scene
-    @on_trait_change('scene1.activated')
-    def populate_scene1(self):
-        self.scene1.mlab.test_surf()
+    def __init__(self, **traits):
+        HasTraits.__init__(self, **traits)
+        self.engine_view = EngineView(engine=self.scene.engine)
 
-    @on_trait_change('scene2.activated')
-    def populate_scene2(self):
-        self.scene2.mlab.test_mesh()
+        # Hook up the current_selection to change when the one in the engine
+        # changes.  This is probably unnecessary in Traits3 since you can show
+        # the UI of a sub-object in T3.
+        self.scene.engine.on_trait_change(self._selection_change,
+                                          'current_selection')
 
-    # The layout of the view
-    view = View(Group(Item('scene1',
-                        editor=SceneEditor(scene_class=MayaviScene),
-                        width=480, height=480)),
-                Group(Item('scene2',
-                        editor=SceneEditor(scene_class=MayaviScene),
-                        width=480, height=480)),
-                resizable=True)
+        self.generate_data_mayavi()
+
+    def generate_data_mayavi(self):
+        """Shows how you can generate data using mayavi instead of mlab."""
+        from mayavi.sources.api import ParametricSurface
+        from mayavi.modules.api import Outline, Surface
+        e = self.scene.engine
+        s = ParametricSurface()
+        e.add_source(s)
+        e.add_module(Outline())
+        e.add_module(Surface())
+
+    def _selection_change(self, old, new):
+        self.trait_property_changed('current_selection', old, new)
+
+    def _get_current_selection(self):
+        return self.scene.engine.current_selection
 
 
 if __name__ == '__main__':
-    MyApp().configure_traits()
+    m = Mayavi()
+    m.configure_traits()
