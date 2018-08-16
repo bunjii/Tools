@@ -240,6 +240,7 @@ class MyMainWindow(QMainWindow):
         self.nodeText = []
         self.elemText = []
         self.loadText = []
+        self.filename = ""
 
         self.window_title = "Structural Tools V.0.1"
         self.container = QWidget()
@@ -290,7 +291,7 @@ class MyMainWindow(QMainWindow):
         ## import data
         import_action = QAction('Open input file', self)
         import_action.setShortcut('Ctrl+O')
-        import_action.triggered.connect(self.show_open_dialog)
+        import_action.triggered.connect(self.open_file_dialog)
 
         ## save input data
         save_action  = QAction('Save input file', self)
@@ -303,7 +304,7 @@ class MyMainWindow(QMainWindow):
 
         # "edit" actions
         show_pipeline_action = QAction('&Show pipeline', self)
-        show_pipeline_action.setShortcut('Ctrl+P')
+        show_pipeline_action.setShortcut('Alt+P')
         show_pipeline_action.triggered.connect(self.mayavi_widget.visualization.showpip)
 
         # "view" actions
@@ -348,7 +349,11 @@ class MyMainWindow(QMainWindow):
     def Solve(self):
         dts = str(datetime.now()) #.strftime('%Y/%m/%d %H:%M:%S')
         self.render_text(self.tab3, "Solve Executed: " + dts + "\n")
-        solve_2d_truss.truss2d(data)
+        # solve 
+        solve_2d_truss.truss2d(data, self.filename)
+        # write output
+        # self.tab2.
+
         dtf = str(datetime.now()) #.strftime('%Y/%m/%d %H:%M:%S')
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
         self.tab3.insertPlainText("Solve Finished: " + dtf + "\n")
@@ -369,14 +374,15 @@ class MyMainWindow(QMainWindow):
             f.close()
             self.statusBar().showMessage('SAVED')
 
-    def show_open_dialog(self):
+    def open_file_dialog(self):
         self.fname = QFileDialog.getOpenFileName(
             self, 'select input data file', '/home', "Data file (*.dat)")
         
         if not self.fname[0]:
             return
 
-        print(self.fname[0])
+        # print(self.fname[0])
+        self.filename = self.fname[0]
         f = open(self.fname[0], 'r')
         self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
     

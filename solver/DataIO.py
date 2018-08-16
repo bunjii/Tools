@@ -501,15 +501,15 @@ def summaryInputData3dTruss(filename, _nodes, _elements, _materials,
 def resultTruss2d(filename, _nodes, _elements):
 
     filenameAbs = os.path.abspath(filename)
-    outputName = 'result_'+filename
+    outputName = 'RES_'+filename
     f = open(outputName, 'w')
 
     # header -- date and filename
     f.write('# --- HEADER ---\n')
     f.write('# \n')
-    f.write('# analysis date: ' + str(datetime.datetime.now()))
+    f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now()))
     f.write('# \n')
-    f.write('# input source: ' + filenameAbs + '\n\n')
+    f.write('# INPUT SOURCE: ' + filenameAbs + '\n\n')
 
     # node deformations
     f.write('# --- NODE ---\n')
@@ -527,6 +527,39 @@ def resultTruss2d(filename, _nodes, _elements):
     f.write('<END OF RESULT> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
 
     f.close()
+
+
+def Write_OutputData2(filename, _nodes, _elements):
+
+    filenameAbs = os.path.abspath(filename)
+    outputName = 'RES_'+filename
+    f = open(outputName, 'w')
+
+    # header -- date and filename
+    f.write('# --- HEADER ---\n')
+    f.write('# \n')
+    f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now()))
+    f.write('# \n')
+    f.write('# INPUT SOURCE: ' + filenameAbs + '\n\n')
+
+    # node deformations
+    f.write('# --- NODE ---\n')
+    f.write('#        ID,       DEFX,       DEFY')
+    f.write(_nodes.outputNodesResult())
+    f.write('\n\n')
+
+    # element forces, stresses and strain
+    f.write('# --- ELEMENT ---\n')
+    f.write('#        ID,   N. FORCE,  N. STRESS,  N. STRAIN')
+    f.write(_elements.outputElemsResult())
+    f.write('\n\n')
+
+    # end of the input data
+    f.write('<END OF RESULT> ' +
+            str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
+
+    f.close()
+
     
 def resultTruss3d(filename, _nodes, _elements):
     

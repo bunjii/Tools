@@ -20,7 +20,7 @@ from solver.DataIO import ReadInput, summaryInputData, resultTruss2d
 
 class solve_2d_truss():
     @staticmethod
-    def truss2d(_strdata):
+    def truss2d(_strdata, _filepath):
         ns = _strdata.Nodes
         elms = _strdata.Elems
         mts = _strdata.Mats
@@ -52,7 +52,8 @@ class solve_2d_truss():
 
         # ****** OUTPUT ******
         # summaryInputData(inputfilename, ns, elms, mts, secs, consts, lds)
-        # resultTruss2d(inputfilename, ns, elms)
+        
+        resultTruss2d(os.path.basename(_filepath), ns, elms)
 
         return _strdata
 
