@@ -3,6 +3,8 @@ import sys
 from datetime import datetime
 
 import numpy as np
+import math
+
 from mayavi import mlab
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -85,7 +87,7 @@ class MyVisuClass(HasTraits):
             y = ylist[i]
             window.nodeText.append(mlab.text3d(
                 x, y, 0, "N"+nidList[i], figure=self.scene.mayavi_scene, 
-                scale=0.1, color=(0.7, 0.7, 0.7)))
+                scale=0.08, color=(1, 1, 1)))
         
         elems = _strdata.Elems.elements
         num_elem = len(elems)
@@ -100,32 +102,56 @@ class MyVisuClass(HasTraits):
             
             x = midpt[0]
             y = midpt[1]
+            if n2.x - n1.x ==0:
+                if n2.y-n1.y > 0:
+                    angle = 90
+                else:
+                    angle = 270
+            else:
+                    angle = math.degrees(math.atan((n2.y-n1.y)/(n2.x-n1.x)))
 
             window.elemText.append(mlab.text3d(
                 x, y, 0, "E"+str(elems[i].id), figure=self.scene.mayavi_scene, 
-                scale=0.1, color=(0.7, 0.7, 0.7)))
+                scale=0.08, color=(1, 1, 1), orientation=(0,0,angle)))
         self.scene.disable_render = False
         # elem text
         
         # loads
+        load_scale_factor = 0.2
         loads = _strdata.Loads.loads
         num_loads = len(loads)
+        xlist = []
+        ylist = []
+        zlist = np.zeros(num_loads)
+        ulist = []
+        vlist = []
+        wlist = np.zeros(num_loads)
         for i in range(num_loads):
-            self.show_load_vec(loads[i], _strdata)
+            n = _strdata.Nodes.findNodeById(loads[i].nodeId)
+            lx = loads[i].loadX
+            ly = loads[i].loadY
+            x = n.x - lx * load_scale_factor
+            y = n.y - ly * load_scale_factor
+            xlist.append(x)
+            ylist.append(y)
+            ulist.append(lx)
+            vlist.append(ly)
+
+            window.loadText.append(mlab.text3d(
+                x, y, 0, ""+str(loads[i].vecLength), figure=self.scene.mayavi_scene,
+                scale=0.08, color=(1, 1, 1), orientation=(0, 0, 0)))
+        x = np.array(xlist)
+        y = np.array(ylist)
+        u = np.array(ulist)
+        v = np.array(vlist)
+        window.loadvecs = mlab.quiver3d(x,y,zlist,u,v,wlist, scale_factor=load_scale_factor)
 
         # global axes
         mlab.orientation_axes(figure=self.scene.mayavi_scene, opacity=1.0, line_width=1.0)  
 
     def show_load_vec(self, _load, _strdata):
         # loads
-        nd = _strdata.Nodes.findNodeById(_load.nodeId)
-        maxVecLength = _strdata.Loads.maxLength 
-        # node X = nd.x
-        # node Y = nd.y
-        # node Z = 0
-        if _load.loadX != 0:
-            
-            pass
+        pass
 
     @on_trait_change('scene.activated')
     def update_plot(self):
@@ -138,17 +164,38 @@ class MyVisuClass(HasTraits):
         mlab.show_pipeline()
     
     def toggle_nid(self):
-        #pass
         if window.tgl_nid == False:
             window.tgl_nid = True
-            window.pts.visible = True
+            #window.pts.visible = True
             for i in range(len(window.nodeText)):
                 window.nodeText[i].visible = True
         else:
             window.tgl_nid = False
-            window.pts.visible = False
+            #window.pts.visible = False
             for i in range(len(window.nodeText)):
                 window.nodeText[i].visible = False
+
+    def toggle_eid(self):
+        if window.tgl_eid == False:
+            window.tgl_eid = True
+            for i in range(len(window.elemText)):
+                window.elemText[i].visible = True
+        else:
+            window.tgl_eid = False
+            for i in range(len(window.elemText)):
+                window.elemText[i].visible = False
+    
+    def toggle_load(self):
+        if window.tgl_lval == False:
+            window.tgl_lval = True
+            window.loadvecs.visible = True
+            for i in range(len(window.loadText)):
+                window.loadText[i].visible = True
+        else:
+            window.tgl_lval = False
+            window.loadvecs.visible = False
+            for i in range(len(window.loadText)):
+                window.loadText[i].visible = False
 
     @staticmethod
     def LinePlot(_sid, _eid, _nodes):
@@ -187,9 +234,12 @@ class MyMainWindow(QMainWindow):
     def initUI(self):
 
         self.tgl_nid = True
+        self.tgl_eid = True
+        self.tgl_lval = True
         self.pts = []
         self.nodeText = []
         self.elemText = []
+        self.loadText = []
 
         self.window_title = "Structural Tools V.0.1"
         self.container = QWidget()
@@ -265,6 +315,14 @@ class MyMainWindow(QMainWindow):
         view_nodeid_action.setShortcut('Alt+N')
         view_nodeid_action.triggered.connect(self.mayavi_widget.visualization.toggle_nid)
 
+        view_elemid_action = QAction('&Toggle element ID', self)
+        view_elemid_action.setShortcut('Alt+M')
+        view_elemid_action.triggered.connect(self.mayavi_widget.visualization.toggle_eid)
+
+        view_load_action = QAction('&Toggle loads', self)
+        view_load_action.setShortcut('Alt+L')
+        view_load_action.triggered.connect(self.mayavi_widget.visualization.toggle_load)
+
         # "solve" actions
         solve_action = QAction('&Solve', self)
         solve_action.setShortcut('F5')
@@ -280,6 +338,8 @@ class MyMainWindow(QMainWindow):
         ## view
         view_menu.addAction(view_xy_action)
         view_menu.addAction(view_nodeid_action)
+        view_menu.addAction(view_elemid_action)
+        view_menu.addAction(view_load_action)
         ## solve
         solve_menu.addAction(solve_action)
         

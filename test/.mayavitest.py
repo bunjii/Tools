@@ -1,58 +1,19 @@
-# Author:  Gael Varoquaux <gael _dot_ varoquaux _at_ normalesup _dot_ org>
-# Copyright (c) 2009, Enthought, Inc.
-# License: BSD Style.
-
-from traits.api import HasTraits, Instance, on_trait_change
-from traitsui.api import View, Group, Item
-
-from mayavi.core.api import Engine
-from mayavi.core.ui.api import MayaviScene, MlabSceneModel, \
-            SceneEditor
-
-################################################################################
-class MyApp(HasTraits):
-
-    # The first engine. As default arguments (an empty tuple) are given,
-    # traits initializes it.
-    engine1 = Instance(Engine, args=())
-
-    scene1 = Instance(MlabSceneModel)
-
-    def _scene1_default(self):
-        " The default initializer for 'scene1' "
-        self.engine1.start()
-        scene1 = MlabSceneModel(engine=self.engine1)
-        return scene1
-
-    engine2 = Instance(Engine, ())
-
-    scene2 = Instance(MlabSceneModel)
-
-    def _scene2_default(self):
-        " The default initializer for 'scene2' "
-        self.engine2.start()
-        scene2 = MlabSceneModel(engine=self.engine2)
-        return scene2
-
-    # We populate the scenes only when it is activated, to avoid problems
-    # with VTK objects that expect an active scene
-    @on_trait_change('scene1.activated')
-    def populate_scene1(self):
-        self.scene1.mlab.test_surf()
-
-    @on_trait_change('scene2.activated')
-    def populate_scene2(self):
-        self.scene2.mlab.test_mesh()
-
-    # The layout of the view
-    view = View(Group(Item('scene1',
-                        editor=SceneEditor(scene_class=MayaviScene),
-                        width=480, height=480)),
-                Group(Item('scene2',
-                        editor=SceneEditor(scene_class=MayaviScene),
-                        width=480, height=480)),
-                resizable=True)
+import numpy
+from mayavi.mlab import *
 
 
-if __name__ == '__main__':
-    MyApp().configure_traits()
+x, y, z = numpy.mgrid[-2:3, -2:3, -2:3]
+print(x)
+r = numpy.sqrt(x ** 2 + y ** 2 + z ** 4)
+u = y * numpy.sin(r) / (r + 0.001)
+v = -x * numpy.sin(r) / (r + 0.001)
+w = numpy.zeros_like(z)
+obj = quiver3d(x, y, z, u, v, w, line_width=3, scale_factor=1)
+
+from mayavi import mlab
+from numpy import random
+
+
+@mlab.show
+def image():
+   mlab.imshow(random.random((10, 10)))
