@@ -145,7 +145,7 @@ class MyVisuClass(HasTraits):
         window.loadvecs = mlab.quiver3d(x, y, zlist, u, v, wlist, 
                                         scale_factor=load_scale_factor, 
                                         mode='2darrow', 
-                                        line_width =3.0,
+                                        line_width =2.0,
                                         color=color_load)
 
         # global axes
@@ -292,12 +292,12 @@ class MyMainWindow(QMainWindow):
 
         # "file" actions
         ## import data
-        import_action = QAction('Open input file', self)
+        import_action = QAction('Open Input File', self)
         import_action.setShortcut('Ctrl+O')
         import_action.triggered.connect(self.open_file_dialog)
 
         ## save input data
-        save_action  = QAction('Save input file', self)
+        save_action  = QAction('Save Input File', self)
         save_action.setShortcut('Ctrl+S')
         save_action.triggered.connect(self.save_file)
 
@@ -306,24 +306,24 @@ class MyMainWindow(QMainWindow):
         close_action.triggered.connect(self.close)
 
         # "edit" actions
-        show_pipeline_action = QAction('&Show pipeline', self)
+        show_pipeline_action = QAction('&Show Pipeline', self)
         show_pipeline_action.setShortcut('Alt+P')
         show_pipeline_action.triggered.connect(self.mayavi_widget.visualization.showpip)
 
         # "view" actions
-        view_xy_action = QAction('&XY plane', self)
+        view_xy_action = QAction('&XY Plane', self)
         view_xy_action.setShortcut('Ctrl+1')
         view_xy_action.triggered.connect(self.mayavi_widget.visualization.reset_view_xy)
 
-        view_nodeid_action = QAction('&Toggle node ID', self)
+        view_nodeid_action = QAction('&Toggle Node ID', self)
         view_nodeid_action.setShortcut('Alt+N')
         view_nodeid_action.triggered.connect(self.mayavi_widget.visualization.toggle_nid)
 
-        view_elemid_action = QAction('&Toggle element ID', self)
+        view_elemid_action = QAction('&Toggle Element ID', self)
         view_elemid_action.setShortcut('Alt+M')
         view_elemid_action.triggered.connect(self.mayavi_widget.visualization.toggle_eid)
 
-        view_load_action = QAction('&Toggle loads', self)
+        view_load_action = QAction('&Toggle Loads', self)
         view_load_action.setShortcut('Alt+L')
         view_load_action.triggered.connect(self.mayavi_widget.visualization.toggle_load)
 
@@ -353,7 +353,7 @@ class MyMainWindow(QMainWindow):
         # record start time
         dts = str(datetime.now())  # .strftime('%Y/%m/%d %H:%M:%S')
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.render_text(self.tab3, "Solve Executed: " + dts + "\n")
+        self.render_text(self.tab3, dts + ": Solve Executed \n")
         # save tab1 to input file
         self.save_file()
         # reset data file
@@ -366,22 +366,18 @@ class MyMainWindow(QMainWindow):
         f.close()
         #
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.tab3.insertPlainText("Reset Datafile: " + str(datetime.now()) + "\n")
+        self.tab3.insertPlainText(str(datetime.now()) + ": Data file reset and Input file read \n")
         # need to retrieve data from tab1
-        # ReadInput(lines, data)
-        # 
-        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.tab3.insertPlainText("Read Input tab: " + str(datetime.now()) + "\n")
         # reset mayavi window
         self.mayavi_widget.visualization.plot_model_geometry(data)
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.tab3.insertPlainText("Redrew Graphics: " + str(datetime.now()) + "\n")
+        self.tab3.insertPlainText(str(datetime.now()) + ": Graphics redrawn \n")
         # 
         # solve 
         solve_2d_truss.truss2d(data, self.filename)
         dtf = str(datetime.now())  # .strftime('%Y/%m/%d %H:%M:%S')
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.tab3.insertPlainText("Solve Finished: " + dtf + "\n")
+        self.tab3.insertPlainText(dtf + ": Solve finished\n")
         # write output to screen
         tab2txt = Write_OutputData(data, self.filename)
         self.render_text(self.tab2, tab2txt)
@@ -393,7 +389,7 @@ class MyMainWindow(QMainWindow):
 
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
         self.tab3.insertPlainText(
-            "Wrote Output: " + str(datetime.now()) + "\n")
+            str(datetime.now()) + ": Output file written \n")
 
         self.statusBar().showMessage('READY')
 

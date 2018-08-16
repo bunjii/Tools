@@ -266,8 +266,8 @@ def WriteInputData2(_strdata):
     _tmplns += '\n'
     _tmplns += '# NUMBER OF NODES: ' + str(len(_nodes.nodes)) +'\n'
     _tmplns += '# NUMBER OF ELEMENTS: ' + str(len(_elements.elements)) +'\n'
-    _tmplns += '# NUMBER OF FIXED NODES: ' + str(len(_constraints.constraints)) +'\n'
-    _tmplns += '# NUMBER OF LOADED NODES: ' + str(len(_loads.loads)) +'\n'
+    _tmplns += '# NUMBER OF CONSTRAINTS: ' + str(len(_constraints.constraints)) +'\n'
+    _tmplns += '# NUMBER OF LOADS: ' + str(len(_loads.loads)) +'\n'
     _tmplns += '\n'
     
     # analysis type
@@ -314,7 +314,7 @@ def WriteInputData2(_strdata):
     _tmplns += '\n\n'
     
     # end of the input data
-    _tmplns += '<END OF INPUT DATA> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
+    _tmplns += '<END OF INPUT DATA> '
     
     return _tmplns
 
