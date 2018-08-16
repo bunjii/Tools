@@ -52,8 +52,7 @@ class solve_2d_truss():
 
         # ****** OUTPUT ******
         # summaryInputData(inputfilename, ns, elms, mts, secs, consts, lds)
-        
-        resultTruss2d(os.path.basename(_filepath), ns, elms)
+        # resultTruss2d(os.path.basename(_filepath), ns, elms)
 
         return _strdata
 

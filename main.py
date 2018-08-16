@@ -30,7 +30,7 @@ from solver.classSolve import (createLoadVector2d, createStiffnessMatrix2d,
                                obtainDefVector, obtainInverseMatrix,
                                obtainNormalForceStressStrain)
 from solver.Condition import Conditions
-from solver.DataIO import ReadInput, resultTruss2d, summaryInputData, WriteInputData2
+from solver.DataIO import ReadInput, resultTruss2d, summaryInputData, WriteInputData2, Write_OutputData
 from solver.Node import Nodes, Node
 from solver.StrData import StructuralData
 from solver.solve_2d_truss import solve_2d_truss
@@ -144,7 +144,8 @@ class MyVisuClass(HasTraits):
         y = np.array(ylist)
         u = np.array(ulist)
         v = np.array(vlist)
-        window.loadvecs = mlab.quiver3d(x,y,zlist,u,v,wlist, scale_factor=load_scale_factor)
+        window.loadvecs = mlab.quiver3d(x, y, zlist, u, v, wlist, 
+                                        scale_factor=load_scale_factor, mode='2darrow', line_width =3.0)
 
         # global axes
         mlab.orientation_axes(figure=self.scene.mayavi_scene, opacity=1.0, line_width=1.0)  
@@ -264,7 +265,8 @@ class MyMainWindow(QMainWindow):
         vtabbox.addWidget(tabs)
         self.tab1 = QPlainTextEdit(tabs)
         self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.tab2 = QWidget(tabs)
+        self.tab2 = QPlainTextEdit(tabs)
+        self.tab2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.tab3 = QPlainTextEdit(tabs2)
         tabs.addTab(self.tab1, "INPUT")
         tabs.addTab(self.tab2, "OUTPUT")
@@ -347,16 +349,51 @@ class MyMainWindow(QMainWindow):
         self.show()
 
     def Solve(self):
-        dts = str(datetime.now()) #.strftime('%Y/%m/%d %H:%M:%S')
+        # record start time
+        dts = str(datetime.now())  # .strftime('%Y/%m/%d %H:%M:%S')
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
         self.render_text(self.tab3, "Solve Executed: " + dts + "\n")
+        # save tab1 to input file
+        self.save_file()
+        # reset data file
+
+        f = open(self.filename, 'r')
+        self.setWindowTitle(self.window_title+" :: "+str(self.filename))
+
+        data.ResetStrData()
+        ReadInput(f.readlines(), data)
+        f.close()
+        #
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+        self.tab3.insertPlainText("Reset Datafile: " + str(datetime.now()) + "\n")
+        # need to retrieve data from tab1
+        # ReadInput(lines, data)
+        # 
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+        self.tab3.insertPlainText("Read Input tab: " + str(datetime.now()) + "\n")
+        # reset mayavi window
+        self.mayavi_widget.visualization.plot_model_geometry(data)
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+        self.tab3.insertPlainText("Redrew Graphics: " + str(datetime.now()) + "\n")
+        # 
         # solve 
         solve_2d_truss.truss2d(data, self.filename)
-        # write output
-        # self.tab2.
-
-        dtf = str(datetime.now()) #.strftime('%Y/%m/%d %H:%M:%S')
+        dtf = str(datetime.now())  # .strftime('%Y/%m/%d %H:%M:%S')
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
         self.tab3.insertPlainText("Solve Finished: " + dtf + "\n")
+        # write output to screen
+        tab2txt = Write_OutputData(data, self.filename)
+        self.render_text(self.tab2, tab2txt)
+        # write output to file
+        outfilename = 'RES_'+ os.path.basename(self.filename)
+        f = open(outfilename, 'w')
+        f.write(tab2txt)
+        f.close()
+
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+        self.tab3.insertPlainText(
+            "Wrote Output: " + str(datetime.now()) + "\n")
+
         self.statusBar().showMessage('READY')
 
     def save_file(self):

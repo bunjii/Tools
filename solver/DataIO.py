@@ -63,8 +63,10 @@ def ReadInput(_filelines, _strdata):
     _constraints = _strdata.Consts
     _loads = _strdata.Loads
     _conds = _strdata.Conds
+    #print("length: lines =" + str(len(lines)) + "\n")
 
     for i in range(len(lines)):
+        #print(i)
         items = []
         if lines[i].startswith('#'):
             continue
@@ -529,7 +531,7 @@ def resultTruss2d(filename, _nodes, _elements):
     f.close()
 
 
-def Write_OutputData2(_strdata):
+def Write_OutputData(_strdata, _filepath):
     
     _nodes = _strdata.Nodes
     _elements = _strdata.Elems
@@ -541,34 +543,34 @@ def Write_OutputData2(_strdata):
 
     _tmplns = ""
 
-    filenameAbs = os.path.abspath(filename)
-    outputName = 'RES_'+filename
-    f = open(outputName, 'w')
+    # filenameAbs = os.path.abspath(filename)
+    # outputName = 'RES_'+filename
+    # f = open(outputName, 'w')
 
     # header -- date and filename
-    f.write('# --- HEADER ---\n')
-    f.write('# \n')
-    f.write('# ANALYSIS DATE: ' + str(datetime.datetime.now()))
-    f.write('# \n')
-    f.write('# INPUT SOURCE: ' + filenameAbs + '\n\n')
+    _tmplns += '# --- HEADER ---\n'
+    _tmplns += '# \n'
+    _tmplns += '# ANALYSIS DATE: ' + datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S') + '\n'
+    _tmplns += '# \n'
+    _tmplns += '# SOURCE: ' + _filepath + '\n\n'
 
     # node deformations
-    f.write('# --- NODE ---\n')
-    f.write('#        ID,       DEFX,       DEFY')
-    f.write(_nodes.outputNodesResult())
-    f.write('\n\n')
+    _tmplns += '# --- NODE ---\n'
+    _tmplns += '#        ID,       DEFX,       DEFY'
+    _tmplns += _nodes.outputNodesResult()
+    _tmplns += '\n\n'
 
     # element forces, stresses and strain
-    f.write('# --- ELEMENT ---\n')
-    f.write('#        ID,   N. FORCE,  N. STRESS,  N. STRAIN')
-    f.write(_elements.outputElemsResult())
-    f.write('\n\n')
+    _tmplns += '# --- ELEMENT ---\n'
+    _tmplns += '#        ID,   N. FORCE,  N. STRESS,  N. STRAIN'
+    _tmplns += _elements.outputElemsResult()
+    _tmplns += '\n\n'
 
     # end of the input data
-    f.write('<END OF RESULT> ' +
-            str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
+    _tmplns += '<END OF RESULT> ' # + datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+    # str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S'))
 
-    f.close()
+    return _tmplns
 
     
 def resultTruss3d(filename, _nodes, _elements):
