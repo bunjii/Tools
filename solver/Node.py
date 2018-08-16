@@ -66,7 +66,7 @@ class Node3d(object):
 
 class Nodes(object):
     """
-    Collection Classes
+    Collection Class
     """
     def __init__(self):
         self.nodes = []

@@ -50,7 +50,7 @@ class MyVisuClass(HasTraits):
     """
     view = View(Item('scene', editor=SceneEditor(),
                     height=250, width=300, show_label=False),
-                resizable=True)  # We need this to resize with the parent widget
+                resizable=True)
 
     def redraw_scene(self):
         mlab.clf(figure=self.scene.mayavi_scene)
@@ -75,30 +75,36 @@ class MyVisuClass(HasTraits):
         y = np.array(ylist)
         z = np.zeros(num_node) # zero element for 2d analysis
 
-        pts = mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, resolution=16, scale_factor=0.07)
+        window.pts = mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, 
+                            resolution=16, scale_factor=0.07)
         
-        nodeText = []
+        self.scene.disable_render = True
+
         for i in range(len(nodes)):
             x = xlist[i]
             y = ylist[i]
-            nodeText.append(mlab.text3d(
+            window.nodeText.append(mlab.text3d(
                 x, y, 0, "N"+nidList[i], figure=self.scene.mayavi_scene, 
                 scale=0.1, color=(0.7, 0.7, 0.7)))
-            nodeText[-1].visible == False
-
+        
         elems = _strdata.Elems.elements
         num_elem = len(elems)
-
-        elemText = []
         for i in range(num_elem):
-            n1 = elems[i].n1
-            n2 = elems[i].n2
-            self.LinePlot(n1, n2, _strdata.Nodes)
+            n1id = elems[i].n1
+            n2id = elems[i].n2
+            self.LinePlot(n1id, n2id, _strdata.Nodes)
+
+            n1 = _strdata.Nodes.findNodeById(n1id)
+            n2 = _strdata.Nodes.findNodeById(n2id)
+            midpt = Node.getMidPointCoordinates(n1,n2)
             
-            #midpt = Node.getMidPointCoordinates(_strdata.Nodes.findNodeById(n1).id,
-            #                                    _strdata.Nodes.findNodeById(n2).id)
-            #print (midpt)
-            # elemText.append(elems[i].id)
+            x = midpt[0]
+            y = midpt[1]
+
+            window.elemText.append(mlab.text3d(
+                x, y, 0, "E"+str(elems[i].id), figure=self.scene.mayavi_scene, 
+                scale=0.1, color=(0.7, 0.7, 0.7)))
+        self.scene.disable_render = False
         # elem text
         
         # loads
@@ -134,7 +140,15 @@ class MyVisuClass(HasTraits):
     def toggle_nid(self):
         #pass
         if window.tgl_nid == False:
-            print("false")
+            window.tgl_nid = True
+            window.pts.visible = True
+            for i in range(len(window.nodeText)):
+                window.nodeText[i].visible = True
+        else:
+            window.tgl_nid = False
+            window.pts.visible = False
+            for i in range(len(window.nodeText)):
+                window.nodeText[i].visible = False
 
     @staticmethod
     def LinePlot(_sid, _eid, _nodes):
@@ -172,7 +186,10 @@ class MyMainWindow(QMainWindow):
 
     def initUI(self):
 
-        self.tgl_nid = False
+        self.tgl_nid = True
+        self.pts = []
+        self.nodeText = []
+        self.elemText = []
 
         self.window_title = "Structural Tools V.0.1"
         self.container = QWidget()
