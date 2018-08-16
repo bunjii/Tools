@@ -1,8 +1,8 @@
 # --- HEADER ---
 # 
-# ANALYSIS DATE: 2018/08/16 21:27:27
+# ANALYSIS DATE: 2018/08/16 22:52:01
 # 
-# SOURCE: C:/Users/bunji/Desktop/gitshare/Tools/input01 _arc.dat
+# SOURCE: /Users/bunji/OneDrive/98_codes/strtools/tools07/input01 _arc.dat
 
 # --- NODE ---
 #        ID,       DEFX,       DEFY
@@ -39,7 +39,7 @@ ELEM,    15,     -2.000,     -0.500,     -0.005
 ELEM,    16,     -2.000,     -0.500,     -0.005
 ELEM,    17,     -1.500,     -0.375,     -0.004
 ELEM,    18,      0.000,      0.000,      0.000
-ELEM,    19,      0.000,      0.000,      0.000
+ELEM,    19,     -0.000,     -0.000,     -0.000
 ELEM,    20,     -0.000,     -0.000,     -0.000
 ELEM,    21,      0.000,      0.000,      0.000
 
