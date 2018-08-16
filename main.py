@@ -45,15 +45,15 @@ class MyVisuClass(HasTraits):
 
     scene = Instance(MlabSceneModel, ())
     # the layout of the dialog created
-    """
+    
     view = View(Item('scene', editor=SceneEditor(scene_class=Scene),
                     height=250, width=300, show_label=False),
-                resizable=True )  # We need this to resize with the parent widget
+                resizable=True ) 
     """
     view = View(Item('scene', editor=SceneEditor(),
                     height=250, width=300, show_label=False),
                 resizable=True)
-
+    """
     def redraw_scene(self):
         mlab.clf(figure=self.scene.mayavi_scene)
         mlab.figure(figure=self.scene.mayavi_scene, bgcolor=(0.15, 0.15, 0.15))
@@ -102,13 +102,8 @@ class MyVisuClass(HasTraits):
             
             x = midpt[0]
             y = midpt[1]
-            if n2.x - n1.x ==0:
-                if n2.y-n1.y > 0:
-                    angle = 90
-                else:
-                    angle = 270
-            else:
-                    angle = math.degrees(math.atan((n2.y-n1.y)/(n2.x-n1.x)))
+
+            angle = 0.0
 
             window.elemText.append(mlab.text3d(
                 x, y, 0, "E"+str(elems[i].id), figure=self.scene.mayavi_scene, 
@@ -118,6 +113,7 @@ class MyVisuClass(HasTraits):
         
         # loads
         load_scale_factor = 0.2
+        color_load = (135/256,206/256,250/256)
         loads = _strdata.Loads.loads
         num_loads = len(loads)
         xlist = []
@@ -137,15 +133,20 @@ class MyVisuClass(HasTraits):
             ulist.append(lx)
             vlist.append(ly)
 
-            window.loadText.append(mlab.text3d(
-                x, y, 0, ""+str(loads[i].vecLength), figure=self.scene.mayavi_scene,
-                scale=0.08, color=(1, 1, 1), orientation=(0, 0, 0)))
+            window.loadText.append(mlab.text3d(x, y, 0, str(loads[i].vecLength), 
+                                               figure=self.scene.mayavi_scene,
+                                               scale=0.08, 
+                                               color=color_load, 
+                                               orientation=(0, 0, 0)))
         x = np.array(xlist)
         y = np.array(ylist)
         u = np.array(ulist)
         v = np.array(vlist)
         window.loadvecs = mlab.quiver3d(x, y, zlist, u, v, wlist, 
-                                        scale_factor=load_scale_factor, mode='2darrow', line_width =3.0)
+                                        scale_factor=load_scale_factor, 
+                                        mode='2darrow', 
+                                        line_width =3.0,
+                                        color=color_load)
 
         # global axes
         mlab.orientation_axes(figure=self.scene.mayavi_scene, opacity=1.0, line_width=1.0)  
