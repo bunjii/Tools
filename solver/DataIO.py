@@ -529,7 +529,17 @@ def resultTruss2d(filename, _nodes, _elements):
     f.close()
 
 
-def Write_OutputData2(filename, _nodes, _elements):
+def Write_OutputData2(_strdata):
+    
+    _nodes = _strdata.Nodes
+    _elements = _strdata.Elems
+    #_materials = _strdata.Mats
+    #_sectionTypes = _strdata.Secs
+    #_constraints = _strdata.Consts
+    #_loads = _strdata.Loads
+    #_conds = _strdata.Conds
+
+    _tmplns = ""
 
     filenameAbs = os.path.abspath(filename)
     outputName = 'RES_'+filename
