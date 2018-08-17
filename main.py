@@ -361,7 +361,7 @@ class MyMainWindow(QMainWindow):
         # record start time
         dts = str(datetime.now())  # .strftime('%Y/%m/%d %H:%M:%S')
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.render_text(self.tab3, dts + ": Solve Executed \n")
+        self.render_text(self.tab3, dts + ": Solve command executed \n")
         # save tab1 to input file
         self.save_file()
         # reset data file
