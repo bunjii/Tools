@@ -8,13 +8,14 @@ import math
 from mayavi import mlab
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QIcon, QFont, QTextCursor
 from PyQt5.QtWidgets import (QAction, QApplication, QBoxLayout, QDesktopWidget,
                              QFileDialog, QGridLayout, QHBoxLayout, QLabel,
                              QLineEdit, QMainWindow, QMenu, QMessageBox,
                              QPushButton, QSizePolicy, QTabWidget, QTextEdit,
-                             QVBoxLayout, QWidget, QPlainTextEdit , qApp)
+                             QVBoxLayout, QWidget, QPlainTextEdit , qApp, QSplitter)
 from traits.api import Button, HasTraits, Instance, on_trait_change
 from traitsui.api import Group, HSplit, Item, View
 from tvtk.pyface.api import Scene
@@ -246,41 +247,48 @@ class MyMainWindow(QMainWindow):
 
         self.window_title = "Structural Tools V.0.1"
         self.container = QWidget()
-        self.gridlayout = QGridLayout(self.container)
+        
         self.setCentralWidget(self.container)
+        self.mylayout = QHBoxLayout(self.container)
         self.setWindowTitle(self.window_title)
         self.statusBar().showMessage("READY")
         self.resize(1200, 800)
 
         # left area
-        # left area tab
-        
-        tabs = QTabWidget()
-        tabs.setFixedWidth(580)
-        tabs.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        tabs2 = QTabWidget()
-        tabs2.setFixedWidth(580)
-        tabs2.setFixedHeight(180)
-        tabs2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        vtabbox = QVBoxLayout()
-        vtabbox.addWidget(tabs)
-        self.tab1 = QPlainTextEdit(tabs)
-        self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.tab2 = QPlainTextEdit(tabs)
-        self.tab2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.tab3 = QPlainTextEdit(tabs2)
-        tabs.addTab(self.tab1, "INPUT")
-        tabs.addTab(self.tab2, "OUTPUT")
-        tabs2.addTab(self.tab3, "CONSOLE")
-        vtabbox.addWidget(tabs2)
+        tabholder1 = QTabWidget(self)
+        tabholder1.setMinimumWidth(500)
+        tabholder1.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
 
+        tabholder2 = QTabWidget(self)
+        tabholder2.setMinimumSize(500,180)
+        tabholder2.setMaximumHeight(300)
+        tabholder2.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        
+        self.tab1 = QPlainTextEdit(tabholder1)
+        self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.tab2 = QPlainTextEdit(tabholder1)
+        self.tab2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.tab3 = QPlainTextEdit(tabholder2)
+        
+        tabholder1.addTab(self.tab1, "INPUT")
+        tabholder1.addTab(self.tab2, "OUTPUT")
+        
+        tabholder2.addTab(self.tab3, "CONSOLE")
+        
         # right area
         self.mayavi_widget = MayaviQWidget()
+        
+        splitter2 = QSplitter(Qt.Vertical)
+        splitter2.addWidget(tabholder1)
+        splitter2.addWidget(tabholder2)
 
-        # register right/left area to gridlayout
-        # self.gridlayout.addWidget(tabs, 0, 0)
-        self.gridlayout.addLayout(vtabbox, 0, 0)
-        self.gridlayout.addWidget(self.mayavi_widget, 0, 1)
+        splitter1 = QSplitter(Qt.Horizontal)
+        splitter1.addWidget(splitter2)
+        splitter1.addWidget(self.mayavi_widget)
+
+        self.mylayout.addWidget(splitter1)
+
+        self.setLayout(self.mylayout)
 
         # menubar
         menubar = self.menuBar()
