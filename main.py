@@ -1,27 +1,25 @@
+import math
 import os
 import sys
 from datetime import datetime
 
 import numpy as np
-import math
-
 from mayavi import mlab
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QIcon, QFont, QTextCursor
+from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtGui import QFont, QIcon, QTextCursor
 from PyQt5.QtWidgets import (QAction, QApplication, QBoxLayout, QDesktopWidget,
                              QFileDialog, QGridLayout, QHBoxLayout, QLabel,
                              QLineEdit, QMainWindow, QMenu, QMessageBox,
-                             QPushButton, QSizePolicy, QTabWidget, QTextEdit,
-                             QVBoxLayout, QWidget, QPlainTextEdit , qApp, QSplitter)
+                             QPlainTextEdit, QPushButton, QSizePolicy,
+                             QSplitter, QTabWidget, QTextEdit, QVBoxLayout,
+                             QWidget, qApp)
 from traits.api import Button, HasTraits, Instance, on_trait_change
 from traitsui.api import Group, HSplit, Item, View
 from tvtk.pyface.api import Scene
 
 import sip
-sip.setapi('QString', 2)
 from solver.classConstraint import Constraints
 from solver.classElement import Elements
 from solver.classLoad import Loads
@@ -31,10 +29,13 @@ from solver.classSolve import (createLoadVector2d, createStiffnessMatrix2d,
                                obtainDefVector, obtainInverseMatrix,
                                obtainNormalForceStressStrain)
 from solver.Condition import Conditions
-from solver.DataIO import ReadInput, resultTruss2d, summaryInputData, WriteInputData2, Write_OutputData
-from solver.Node import Nodes, Node
-from solver.StrData import StructuralData
+from solver.DataIO import (ReadInput, Write_OutputData, WriteInputData2,
+                           resultTruss2d, summaryInputData)
+from solver.Node import Node, Nodes
 from solver.solve_2d_truss import solve_2d_truss
+from solver.StrData import StructuralData
+
+sip.setapi('QString', 2)
 
 ################################################################################
 # Mayavi Part
