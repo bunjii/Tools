@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import (QAction, QApplication, QBoxLayout, QDesktopWidget,
                              QLineEdit, QMainWindow, QMenu, QMessageBox,
                              QPlainTextEdit, QPushButton, QSizePolicy,
                              QSplitter, QTabWidget, QTextEdit, QVBoxLayout,
-                             QWidget, qApp)
+                             QWidget, qApp, QRadioButton, QButtonGroup)
 from traits.api import Button, HasTraits, Instance, on_trait_change
 from traitsui.api import Group, HSplit, Item, View
 from tvtk.pyface.api import Scene
@@ -229,6 +229,38 @@ class MayaviQWidget(QWidget):
 # UI
 ################################################################################
 
+class OutputWidget(QWidget):
+    def __init__(self, parent=None):
+        super(QWidget, self).__init__(parent)
+
+        radio1 = QRadioButton('Disp.')
+        radio2 = QRadioButton('Stress')
+
+        push1 = QPushButton('Show/Hide')
+
+        self.group = QButtonGroup()
+        self.group.addButton(radio1, 1)
+        self.group.addButton(radio2, 2)
+        # self.group.addButton(push1,3)
+        # radio1.toggle()
+
+        # self.tab1 = QPlainTextEdit(self)
+        # self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        #button = QPushButton('Check')
+        #button.clicked.connect(self.buttonClicked)
+
+        layout = QVBoxLayout()
+        layout.addWidget(radio1)
+        layout.addWidget(radio2)
+        layout.addWidget(push1)
+        # layout.addWidget(self.tab1)
+
+        self.setLayout(layout)
+
+    #def buttonClicked(self):
+    #    print('Radio: %d' % self.group.checkedId())
+
 class MyMainWindow(QMainWindow):
 
     def __init__(self):
@@ -256,26 +288,39 @@ class MyMainWindow(QMainWindow):
         self.resize(1200, 800)
 
         # left area
+
+        # left upper: tabholder 1
         tabholder1 = QTabWidget(self)
         tabholder1.setMinimumWidth(500)
         tabholder1.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
 
+        # left lower: tabholder 2
         tabholder2 = QTabWidget(self)
         tabholder2.setMinimumSize(500,180)
         tabholder2.setMaximumHeight(300)
         tabholder2.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        
+        #
+        #
+        # tab1 < tabholder 1
         self.tab1 = QPlainTextEdit(tabholder1)
         self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # tab2 < tabholder 1
         self.tab2 = QPlainTextEdit(tabholder1)
         self.tab2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # tab2b < tabholder 1
+        self.tab2b = OutputWidget(self)
+
+        # tab3 < tabholder 2
         self.tab3 = QPlainTextEdit(tabholder2)
         
         tabholder1.addTab(self.tab1, "INPUT")
         tabholder1.addTab(self.tab2, "OUTPUT")
+        tabholder1.addTab(self.tab2b, "DISPLAY")
         
         tabholder2.addTab(self.tab3, "CONSOLE")
-        
+
         # right area
         self.mayavi_widget = MayaviQWidget()
         
@@ -289,7 +334,7 @@ class MyMainWindow(QMainWindow):
 
         self.mylayout.addWidget(splitter1)
 
-        self.setLayout(self.mylayout)
+        # self.setLayout(self.mylayout)
 
         # menubar
         menubar = self.menuBar()
@@ -390,6 +435,8 @@ class MyMainWindow(QMainWindow):
         # write output to screen
         tab2txt = Write_OutputData(data, self.filename)
         self.render_text(self.tab2, tab2txt)
+        # self.render_text(self.tab2b.tab1, tab2txt)
+
         # write output to file
         outfilename = 'RES_'+ os.path.basename(self.filename)
         f = open(outfilename, 'w')
