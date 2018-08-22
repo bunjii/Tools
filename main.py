@@ -278,7 +278,7 @@ class InputWidget(QWidget):
         self.setLayout(layout)
 
     def buttonClicked(self):
-        print("updated!")
+        window.save_and_update_graphics('Update')
 
 class MyMainWindow(QMainWindow):
 
@@ -427,28 +427,8 @@ class MyMainWindow(QMainWindow):
         self.show()
 
     def Solve(self):
-        # record start time
-        dts = str(datetime.now())  # .strftime('%Y/%m/%d %H:%M:%S')
-        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.render_text(self.tab3, dts + ": Solve command executed \n")
-        # save tab1 to input file
-        self.save_file()
-        # reset data file
-
-        f = open(self.filename, 'r')
-        self.setWindowTitle(self.window_title+" :: "+str(self.filename))
-
-        data.ResetStrData()
-        ReadInput(f.readlines(), data)
-        f.close()
-        #
-        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.tab3.insertPlainText(str(datetime.now()) + ": Data file reset and Input file read \n")
-        # need to retrieve data from tab1
-        # reset mayavi window
-        self.mayavi_widget.visualization.plot_model_geometry(data)
-        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.tab3.insertPlainText(str(datetime.now()) + ": Graphics redrawn \n")
+        # 
+        self.save_and_update_graphics('Solve')
         # 
         # solve 
         solve_2d_truss.truss2d(data, self.filename)
@@ -471,6 +451,30 @@ class MyMainWindow(QMainWindow):
             str(datetime.now()) + ": Output file written \n")
 
         self.statusBar().showMessage('READY')
+    
+    def save_and_update_graphics(self, _mstring):
+        # record start time
+        dts = str(datetime.now())  # .strftime('%Y/%m/%d %H:%M:%S')
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+        self.render_text(self.tab3, dts + ": {} command executed \n".format(_mstring))
+        # save tab1 to input file
+        self.save_file()
+        # reset data file
+
+        f = open(self.filename, 'r')
+        self.setWindowTitle(self.window_title+" :: "+str(self.filename))
+
+        data.ResetStrData()
+        ReadInput(f.readlines(), data)
+        f.close()
+        #
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+        self.tab3.insertPlainText(str(datetime.now()) + ": Data file reset and Input file read \n")
+        # need to retrieve data from tab1
+        # reset mayavi window
+        self.mayavi_widget.visualization.plot_model_geometry(data)
+        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+        self.tab3.insertPlainText(str(datetime.now()) + ": Graphics redrawn \n")
 
     def save_file(self):
         # retrieve what's written in the text tab
