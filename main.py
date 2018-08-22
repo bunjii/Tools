@@ -229,7 +229,7 @@ class MayaviQWidget(QWidget):
 # UI
 ################################################################################
 
-class OutputWidget(QWidget):
+class DisplayWidget(QWidget):
     def __init__(self, parent=None):
         super(QWidget, self).__init__(parent)
 
@@ -256,6 +256,27 @@ class OutputWidget(QWidget):
         layout.addWidget(push1)
         # layout.addWidget(self.tab1)
 
+        self.setLayout(layout)
+
+    #def buttonClicked(self):
+    #    print('Radio: %d' % self.group.checkedId())
+
+class InputWidget(QWidget):
+    def __init__(self, parent=None):
+        super(QWidget, self).__init__(parent)
+
+        push1 = QPushButton('Save | Update Graphics')
+
+        #button = QPushButton('Check')
+        #button.clicked.connect(self.buttonClicked)
+
+        self.textfield = QPlainTextEdit(self)
+        self.textfield.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        layout = QVBoxLayout()
+        layout.addWidget(push1)
+        layout.addWidget(self.textfield)
+        
         self.setLayout(layout)
 
     #def buttonClicked(self):
@@ -302,20 +323,24 @@ class MyMainWindow(QMainWindow):
         #
         #
         # tab1 < tabholder 1
-        self.tab1 = QPlainTextEdit(tabholder1)
-        self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.tab1 = QPlainTextEdit(tabholder1)
+        # self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # tab2 < tabholder 1
         self.tab2 = QPlainTextEdit(tabholder1)
         self.tab2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # tab2b < tabholder 1
-        self.tab2b = OutputWidget(self)
+        self.tab2b = DisplayWidget(self)
+
+        # tab1b < tabholder 1
+        self.tab1b = InputWidget(self)
 
         # tab3 < tabholder 2
         self.tab3 = QPlainTextEdit(tabholder2)
         
-        tabholder1.addTab(self.tab1, "INPUT")
+        # tabholder1.addTab(self.tab1, "INPUT_ALT")
+        tabholder1.addTab(self.tab1b, "INPUT")
         tabholder1.addTab(self.tab2, "OUTPUT")
         tabholder1.addTab(self.tab2b, "DISPLAY")
         
@@ -451,7 +476,8 @@ class MyMainWindow(QMainWindow):
 
     def save_file(self):
         # retrieve what's written in the text tab
-        lines = self.tab1.toPlainText()
+        # lines = self.tab1.toPlainText()
+        lines = self.tab1b.textfield.toPlainText()
         # write down to a file (overwrite caution?)
         if not self.fname: 
             ### doesn't work here at the moment.
@@ -483,8 +509,9 @@ class MyMainWindow(QMainWindow):
         self.mayavi_widget.visualization.plot_model_geometry(data)  
 
         filepath = self.fname[0]
-        tab1txt = WriteInputData2(data)
-        self.render_text(self.tab1, tab1txt)
+        input_text = WriteInputData2(data)
+        # self.render_text(self.tab1, input_text)
+        self.render_text(self.tab1b.textfield, input_text)
 
     def render_text(self, _widget, _txt):
         if os.name == 'nt': # windows
