@@ -266,9 +266,7 @@ class InputWidget(QWidget):
         super(QWidget, self).__init__(parent)
 
         push1 = QPushButton('Save | Update Graphics')
-
-        #button = QPushButton('Check')
-        #button.clicked.connect(self.buttonClicked)
+        push1.clicked.connect(self.buttonClicked)
 
         self.textfield = QPlainTextEdit(self)
         self.textfield.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -279,8 +277,8 @@ class InputWidget(QWidget):
         
         self.setLayout(layout)
 
-    #def buttonClicked(self):
-    #    print('Radio: %d' % self.group.checkedId())
+    def buttonClicked(self):
+        print("updated!")
 
 class MyMainWindow(QMainWindow):
 
