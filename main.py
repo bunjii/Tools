@@ -150,6 +150,39 @@ class MyVisuClass(HasTraits):
                                         line_width =2.0,
                                         color=color_load)
 
+        # constraints
+        const_scale_factor = 0.2
+        color_consts = (128/256,255/256,0/256) # light green
+        consts = _strdata.Consts.constraints
+        num_consts = len(consts)
+        xlist = []
+        ylist = []
+        zlist = np.zeros(num_consts)
+        ulist = []
+        vlist = []
+        wlist = np.zeros(num_consts)
+        for i in range(num_consts):
+            n = _strdata.Nodes.findNodeById(consts[i].nodeId)
+            cx = consts[i].cX
+            cy = consts[i].cY
+            x = n.x - cx * const_scale_factor
+            y = n.y - cy * const_scale_factor
+            xlist.append(x)
+            ylist.append(y)
+            ulist.append(cx)
+            vlist.append(cy)
+
+        x = np.array(xlist)
+        y = np.array(ylist)
+        u = np.array(ulist)
+        v = np.array(vlist)
+        window.constvecs = mlab.quiver3d(x, y, zlist, u, v, wlist, 
+                                        scale_factor=const_scale_factor, 
+                                        mode='2darrow', 
+                                        line_width =2.0,
+                                        color=color_consts)
+
+
         # global axes
         mlab.orientation_axes(figure=self.scene.mayavi_scene, opacity=1.0, line_width=1.0)  
 
