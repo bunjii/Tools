@@ -35,7 +35,7 @@ class solve_2d_truss():
         elms.appendElementStiffnessMatrix2d()
         ns.appendLoad(lds)
 
-        #elms.outputElemsStiffness()
+        # elms.outputElemsStiffness()
         # summaryInputData(inputfilename, ns, elms, mts, secs, consts, lds)
         # print (elms.outputElemsStiffness())
 

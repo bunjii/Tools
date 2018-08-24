@@ -12,6 +12,8 @@ class Node(object):
         self.id = _id
         self.x = _x
         self.y = _y
+        self.defX = 0
+        self.defY = 0
 
     def getId(self):
         return self.id

@@ -1,6 +1,6 @@
 # --- HEADER ---
 
-# ANALYSIS DATE: 2018/08/24 10:31:57
+# ANALYSIS DATE: 2018/08/24 13:26:40
 # NUMBER OF NODES: 12
 # NUMBER OF ELEMENTS: 21
 # NUMBER OF CONSTRAINTS: 2
@@ -70,6 +70,6 @@ LOAD,     2,     5,      0.000,     -2.000
 LOAD,     3,     7,      0.000,     -2.000
 LOAD,     4,     9,      0.000,     -2.000
 LOAD,     5,    11,      0.000,     -2.000
-LOAD,     6,    11,     -2.000,      0.000
+#LOAD,     6,    11,     -2.000,      0.000
 
 <END OF INPUT DATA> 

@@ -60,13 +60,40 @@ class MyVisuClass(HasTraits):
         mlab.clf(figure=self.scene.mayavi_scene)
         mlab.figure(figure=self.scene.mayavi_scene, bgcolor=(0.15, 0.15, 0.15))
 
+    def plot_deformation(self, _strdata):
+        # elements + elemtext
+        self.scene.disable_render = True
+        self.def_factor = 1.0
+        color_def = (0/256,255/256,255/256) # cyan
+        elems = _strdata.Elems.elements
+        num_elem = len(elems)
+        for i in range(num_elem):
+            # detect node of each element
+            n1 = _strdata.Nodes.findNodeById(elems[i].n1)
+            n2 = _strdata.Nodes.findNodeById(elems[i].n2)
+            # find node deformation vectors
+            xlist = []
+            ylist = []
+            zlist = []
+
+            xlist.append(n1.x + self.def_factor * n1.defX)
+            ylist.append(n1.y + self.def_factor * n1.defY)
+            zlist.append(0)
+            xlist.append(n2.x + self.def_factor * n2.defX)
+            ylist.append(n2.y + self.def_factor * n2.defY)
+            zlist.append(0)
+
+            window.elemdef.append(mlab.plot3d(xlist, ylist, zlist, line_width=1.0,
+                                              opacity=0.8, tube_radius=None, color= color_def))
+        self.scene.disable_render = False
+
     def plot_model_geometry(self, _strdata):
         mlab.clf(figure=self.scene.mayavi_scene) 
 
         # node
         nodes = _strdata.Nodes.nodes
         num_node = len(nodes)
-        node_scale_factor = 0.07
+        node_scale_factor = 0.03
         xlist = []
         ylist = []
         zlist = []
@@ -92,6 +119,7 @@ class MyVisuClass(HasTraits):
                 x, y, 0, "N"+nidList[i], figure=self.scene.mayavi_scene, 
                 scale=0.08, color=(1, 1, 1)))
         
+        # elements + elemtext
         elems = _strdata.Elems.elements
         num_elem = len(elems)
         for i in range(num_elem):
@@ -112,7 +140,6 @@ class MyVisuClass(HasTraits):
                 x, y, 0, "E"+str(elems[i].id), figure=self.scene.mayavi_scene, 
                 scale=0.08, color=(1, 1, 1), orientation=(0,0,angle)))
         self.scene.disable_render = False
-        # elem text
         
         # loads
         load_scale_factor = 0.2
@@ -207,13 +234,8 @@ class MyVisuClass(HasTraits):
                                         resolution = 32,
                                         color=color_consts)
 
-
         # global axes
         mlab.orientation_axes(figure=self.scene.mayavi_scene, opacity=1.0, line_width=1.0)  
-
-    def show_load_vec(self, _load, _strdata):
-        # loads
-        pass
 
     @on_trait_change('scene.activated')
     def update_plot(self):
@@ -259,12 +281,35 @@ class MyVisuClass(HasTraits):
             for i in range(len(window.loadText)):
                 window.loadText[i].visible = False
 
+    def toggle_consts(self):
+        if window.tgl_consts == False:
+            window.tgl_consts = True
+            window.constvecs.visible = True
+        else:
+            window.tgl_consts = False
+            window.constvecs.visible = False
+    
+    def toggle_deformation(self):
+        if window.tgl_deformation == False:
+            window.tgl_deformation = True
+            self.scene.disable_render = True
+            for e in window.elemdef:
+                e.visible = True
+            self.scene.disable_render = False
+        else:
+            window.tgl_deformation = False
+            self.scene.disable_render = True
+            for e in window.elemdef:
+                e.visible = False
+            self.scene.disable_render = False
+
     @staticmethod
     def LinePlot(_sid, _eid, _nodes):
         spt = _nodes.findNodeById(_sid)
         ept = _nodes.findNodeById(_eid)
         mlab.plot3d([spt.x, ept.x], [spt.y, ept.y], [0.0, 0.0], 
                                  line_width=1.0, opacity=0.8, tube_radius=None)
+
 
 ################################################################################
 # The QWidget containing the visualization, this is pure PyQt4 code.
@@ -349,10 +394,13 @@ class MyMainWindow(QMainWindow):
         self.tgl_nid = True
         self.tgl_eid = True
         self.tgl_lval = True
+        self.tgl_consts = True
+        self.tgl_deformation = True
         self.pts = []
         self.nodeText = []
         self.elemText = []
         self.loadText = []
+        self.elemdef = []
         self.filename = ""
 
         self.window_title = "Structural Tools V.0.1"
@@ -462,6 +510,14 @@ class MyMainWindow(QMainWindow):
         view_load_action.setShortcut('Alt+L')
         view_load_action.triggered.connect(self.mayavi_widget.visualization.toggle_load)
 
+        view_const_actiton = QAction('&Toggle Constraints', self)
+        view_const_actiton.setShortcut('ALT+C')
+        view_const_actiton.triggered.connect(self.mayavi_widget.visualization.toggle_consts)
+
+        view_def_action = QAction('&Toggle Deformation', self)
+        view_def_action.setShortcut('Alt+D')
+        view_def_action.triggered.connect(self.mayavi_widget.visualization.toggle_deformation)
+
         # "solve" actions
         solve_action = QAction('&Solve', self)
         solve_action.setShortcut('F5')
@@ -479,6 +535,8 @@ class MyMainWindow(QMainWindow):
         view_menu.addAction(view_nodeid_action)
         view_menu.addAction(view_elemid_action)
         view_menu.addAction(view_load_action)
+        view_menu.addAction(view_const_actiton)
+        view_menu.addAction(view_def_action)
         ## solve
         solve_menu.addAction(solve_action)
         
@@ -507,9 +565,13 @@ class MyMainWindow(QMainWindow):
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
         self.tab3.insertPlainText(
             str(datetime.now()) + ": Output file written \n")
+        
+        # deformation
+        self.mayavi_widget.visualization.plot_deformation(data)
+        # stress contour
 
         self.statusBar().showMessage('READY')
-    
+
     def save_and_update_graphics(self, _mstring):
         # record start time
         dts = str(datetime.now())  # .strftime('%Y/%m/%d %H:%M:%S')
@@ -529,8 +591,10 @@ class MyMainWindow(QMainWindow):
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
         self.tab3.insertPlainText(str(datetime.now()) + ": Data file reset and Input file read \n")
         # need to retrieve data from tab1
+        # 
         # reset mayavi window
         self.mayavi_widget.visualization.plot_model_geometry(data)
+        #
         self.tab3.moveCursor(QTextCursor.MoveOperation(11))
         self.tab3.insertPlainText(str(datetime.now()) + ": Graphics redrawn \n")
 
