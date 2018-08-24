@@ -66,6 +66,7 @@ class MyVisuClass(HasTraits):
         # node
         nodes = _strdata.Nodes.nodes
         num_node = len(nodes)
+        node_scale_factor = 0.07
         xlist = []
         ylist = []
         zlist = []
@@ -80,7 +81,7 @@ class MyVisuClass(HasTraits):
         z = np.zeros(num_node) # zero element for 2d analysis
 
         window.pts = mlab.points3d(x,y,z,figure=self.scene.mayavi_scene, 
-                            resolution=16, scale_factor=0.07)
+                            resolution=16, scale_factor=node_scale_factor)
         
         self.scene.disable_render = True
 
@@ -152,34 +153,58 @@ class MyVisuClass(HasTraits):
 
         # constraints
         const_scale_factor = 0.2
-        color_consts = (128/256,255/256,0/256) # light green
+        color_consts = (255/256,0/256,0/256) # red
         consts = _strdata.Consts.constraints
         num_consts = len(consts)
         xlist = []
         ylist = []
-        zlist = np.zeros(num_consts)
+        zlist = [] # np.zeros(num_consts)
         ulist = []
         vlist = []
-        wlist = np.zeros(num_consts)
+        wlist = [] # np.zeros(num_consts)
         for i in range(num_consts):
             n = _strdata.Nodes.findNodeById(consts[i].nodeId)
             cx = consts[i].cX
             cy = consts[i].cY
-            x = n.x - cx * const_scale_factor
-            y = n.y - cy * const_scale_factor
-            xlist.append(x)
-            ylist.append(y)
-            ulist.append(cx)
-            vlist.append(cy)
+            if cx == 0 and cy == 0:
+                continue
+            elif cx == 1 and cy ==1:
+                x = n.x - cx * const_scale_factor
+                y = n.y
+                xlist.append(x)
+                ylist.append(y)
+                zlist.append(0)
+                ulist.append(cx)
+                vlist.append(0)
+                wlist.append(0)
+                x = n.x
+                y = n.y - cy * const_scale_factor
+                xlist.append(x)
+                ylist.append(y)
+                zlist.append(0)
+                ulist.append(0)
+                vlist.append(cy)
+                wlist.append(0)
+            else:
+                x = n.x - cx * const_scale_factor
+                y = n.y - cy * const_scale_factor
+                xlist.append(x)
+                ylist.append(y)
+                zlist.append(0)
+                ulist.append(cx)
+                vlist.append(cy)
+                wlist.append(0)
 
         x = np.array(xlist)
         y = np.array(ylist)
+        z = np.array(zlist)
         u = np.array(ulist)
         v = np.array(vlist)
-        window.constvecs = mlab.quiver3d(x, y, zlist, u, v, wlist, 
+        w = np.array(wlist)
+        window.constvecs = mlab.quiver3d(x, y, z, u, v, w, 
                                         scale_factor=const_scale_factor, 
-                                        mode='2darrow', 
-                                        line_width =2.0,
+                                        mode='arrow', 
+                                        resolution = 32,
                                         color=color_consts)
 
 
