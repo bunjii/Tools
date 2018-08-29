@@ -83,7 +83,7 @@ class MyVisuClass(HasTraits):
             ylist.append(n2.y + self.def_factor * n2.defY)
             zlist.append(0)
 
-            window.elemdef.append(mlab.plot3d(xlist, ylist, zlist, line_width=1.0,
+            window.elemdef.append(mlab.plot3d(xlist, ylist, zlist, line_width=2.0,
                                               opacity=0.8, tube_radius=None, color= color_def))
         self.scene.disable_render = False
 
@@ -138,7 +138,7 @@ class MyVisuClass(HasTraits):
 
             window.elemText.append(mlab.text3d(
                 x, y, 0, "E"+str(elems[i].id), figure=self.scene.mayavi_scene, 
-                scale=0.08, color=(1, 1, 1), orientation=(0,0,angle)))
+                scale=0.08, color=(1, 1, 1), orientation=(0, 0, angle)))
         self.scene.disable_render = False
         
         # loads
@@ -308,7 +308,7 @@ class MyVisuClass(HasTraits):
         spt = _nodes.findNodeById(_sid)
         ept = _nodes.findNodeById(_eid)
         mlab.plot3d([spt.x, ept.x], [spt.y, ept.y], [0.0, 0.0], 
-                                 line_width=1.0, opacity=0.8, tube_radius=None)
+                                 line_width=2.0, opacity=1.0, tube_radius=None)
 
 
 ################################################################################
@@ -344,16 +344,11 @@ class DisplayWidget(QWidget):
         self.group = QButtonGroup()
         self.group.addButton(radio1, 1)
         self.group.addButton(radio2, 2)
-        # self.group.addButton(push1,3)
         # radio1.toggle()
 
-        # self.tab1 = QPlainTextEdit(self)
-        # self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
-        #button = QPushButton('Check')
-        #button.clicked.connect(self.buttonClicked)
-
         layout = QVBoxLayout()
+
+        layout.setContentsMargins(0, 0, 0, 10)
         layout.addWidget(radio1)
         layout.addWidget(radio2)
         layout.addWidget(push1)
@@ -361,8 +356,6 @@ class DisplayWidget(QWidget):
 
         self.setLayout(layout)
 
-    #def buttonClicked(self):
-    #    print('Radio: %d' % self.group.checkedId())
 
 class InputWidget(QWidget):
     def __init__(self, parent=None):
@@ -375,7 +368,8 @@ class InputWidget(QWidget):
         self.textfield.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         layout = QVBoxLayout()
-        layout.addWidget(push1)
+        layout.setContentsMargins(0, 0, 0, 10)
+        layout.addWidget(push1) 
         layout.addWidget(self.textfield)
         
         self.setLayout(layout)
@@ -427,8 +421,6 @@ class MyMainWindow(QMainWindow):
         #
         #
         # tab1 < tabholder 1
-        # self.tab1 = QPlainTextEdit(tabholder1)
-        # self.tab1.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # tab2 < tabholder 1
         self.tab2 = QPlainTextEdit(tabholder1)
@@ -437,14 +429,14 @@ class MyMainWindow(QMainWindow):
         # tab2b < tabholder 1
         self.tab2b = DisplayWidget(self)
 
-        # tab1b < tabholder 1
-        self.tab1b = InputWidget(self)
+        # tab1 < tabholder 1
+        self.tab1 = InputWidget(self)
 
         # tab3 < tabholder 2
         self.tab3 = QPlainTextEdit(tabholder2)
         
         # tabholder1.addTab(self.tab1, "INPUT_ALT")
-        tabholder1.addTab(self.tab1b, "INPUT")
+        tabholder1.addTab(self.tab1, "INPUT")
         tabholder1.addTab(self.tab2, "OUTPUT")
         tabholder1.addTab(self.tab2b, "DISPLAY")
         
@@ -601,7 +593,7 @@ class MyMainWindow(QMainWindow):
     def save_file(self):
         # retrieve what's written in the text tab
         # lines = self.tab1.toPlainText()
-        lines = self.tab1b.textfield.toPlainText()
+        lines = self.tab1.textfield.toPlainText()
         # write down to a file (overwrite caution?)
         if not self.fname: 
             ### doesn't work here at the moment.
@@ -635,7 +627,7 @@ class MyMainWindow(QMainWindow):
         filepath = self.fname[0]
         input_text = WriteInputData2(data)
         # self.render_text(self.tab1, input_text)
-        self.render_text(self.tab1b.textfield, input_text)
+        self.render_text(self.tab1.textfield, input_text)
 
     def render_text(self, _widget, _txt):
         if os.name == 'nt': # windows

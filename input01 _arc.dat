@@ -1,10 +1,10 @@
 # --- HEADER ---
 
-# ANALYSIS DATE: 2018/08/24 21:45:42
+# ANALYSIS DATE: 2018/08/26 00:38:51
 # NUMBER OF NODES: 12
 # NUMBER OF ELEMENTS: 21
 # NUMBER OF CONSTRAINTS: 2
-# NUMBER OF LOADS: 5
+# NUMBER OF LOADS: 4
 
 # TYPE OF ANALYSIS 
 # (1: LINEAR STATIC, 2D TRUSS) 
@@ -52,7 +52,7 @@ ELEM,    21,     1,     2,     1,     1
 
 # --- MATERIAL ---
 #        ID,  NAME,          E
-MAT,      1, steel,        210
+MAT,      1, steel,    210.000
 
 # --- SECTION ---
 #        ID,       AREA, MOM. INERT
@@ -60,9 +60,8 @@ SEC,      1,      4.000,     12.000
 
 # --- CONSTRAINTS (0:FREE, 1:FIXED) ---
 #        ID,   NID,     X,     Y
-# CONS,     1,     1,     1,     1
 CONS,     2,     2,     1,     1
-CONS, 3, 12, 0,1
+CONS,     3,    12,     0,     1
 
 # --- LOADS ---
 #        ID,   NID,          X,          Y
@@ -70,6 +69,5 @@ LOAD,     1,     3,      0.000,     -2.000
 LOAD,     2,     5,      0.000,     -2.000
 LOAD,     3,     7,      0.000,     -2.000
 LOAD,     4,     9,      0.000,     -2.000
-# LOAD,     5,    11,      0.000,     -2.000
 
 <END OF INPUT DATA> 
