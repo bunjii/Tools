@@ -476,6 +476,11 @@ class MyMainWindow(QMainWindow):
         solve_menu = menubar.addMenu('&Solve')
 
         # "file" actions
+        ## start a new file 
+        anew_action = QAction('Start a new File', self)
+        anew_action.setShortcut('Ctrl+N')
+        anew_action.triggered.connect(self.anew_dialog)
+
         ## import data
         import_action = QAction('Open Input File', self)
         import_action.setShortcut('Ctrl+O')
@@ -527,6 +532,7 @@ class MyMainWindow(QMainWindow):
 
         # register actions to menu
         ## file
+        file_menu.addAction(anew_action)
         file_menu.addAction(import_action)
         file_menu.addAction(save_action)
         file_menu.addAction(close_action)
@@ -573,6 +579,33 @@ class MyMainWindow(QMainWindow):
         # stress contour
 
         self.statusBar().showMessage('READY')
+    
+    def anew_dialog(self):
+        if self.tab1.textfield.toPlainText() == "":
+            self.reset_data()
+        
+        else:
+            confirm = self.show_messagebox('Are you sure?')
+        
+            if confirm == True:
+                self.reset_data()
+            else:
+                pass
+
+    def reset_data(self):
+        # delete structural data
+        data.ResetStrData()
+
+        # delete mayavi window
+        self.mayavi_widget.visualization.redraw_scene()
+
+        # delete text fields
+        self.tab1.textfield.clear()
+        self.tab2.clear()
+
+        # delete file info
+        self.filename = ""
+        self.setWindowTitle(self.window_title)
 
     def save_and_update_graphics(self, _mstring):
         # record start time
@@ -583,35 +616,34 @@ class MyMainWindow(QMainWindow):
         self.save_file()
         # reset data file
 
-        f = open(self.filename, 'r')
-        self.setWindowTitle(self.window_title+" :: "+str(self.filename))
+        if self.filename != "":
+            f = open(self.filename, 'r')
+            self.setWindowTitle(self.window_title+" :: "+str(self.filename))
 
-        data.ResetStrData()
-        ReadInput(f.readlines(), data)
-        f.close()
-        #
-        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.tab3.insertPlainText(str(datetime.now()) + ": Data file reset and Input file read \n")
-        # need to retrieve data from tab1
-        # 
-        # reset mayavi window
-        self.mayavi_widget.visualization.plot_model_geometry(data)
-        #
-        self.tab3.moveCursor(QTextCursor.MoveOperation(11))
-        self.tab3.insertPlainText(str(datetime.now()) + ": Graphics redrawn \n")
+            data.ResetStrData()
+            ReadInput(f.readlines(), data)
+            f.close()
+            #
+            self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+            self.tab3.insertPlainText(str(datetime.now()) + ": Data file reset and Input file read \n")
+            # need to retrieve data from tab1
+            # 
+            # reset mayavi window
+            self.mayavi_widget.visualization.plot_model_geometry(data)
+            #
+            self.tab3.moveCursor(QTextCursor.MoveOperation(11))
+            self.tab3.insertPlainText(str(datetime.now()) + ": Graphics redrawn \n")
 
     def save_file(self):
         # retrieve what's written in the text tab
-        # lines = self.tab1.toPlainText()
         lines = self.tab1.textfield.toPlainText()
+
         # write down to a file (overwrite caution?)
-        if not self.fname: 
-            ### doesn't work here at the moment.
+        if self.filename == "": 
             print("file destination not specified")
             pass
         else:
-            ### else is also unstable.
-            f = open(self.fname[0],'w')
+            f = open(self.filename,'w')
             f.write(lines)
             f.close()
             self.statusBar().showMessage('SAVED')
@@ -623,10 +655,9 @@ class MyMainWindow(QMainWindow):
         if not self.fname[0]:
             return
 
-        # print(self.fname[0])
         self.filename = self.fname[0]
-        f = open(self.fname[0], 'r')
-        self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
+        f = open(self.filename, 'r')
+        self.setWindowTitle(self.window_title+" :: "+str(self.filename))
     
         data.ResetStrData()
         # read input ####################################################################
@@ -652,6 +683,15 @@ class MyMainWindow(QMainWindow):
         _widget.setFont(font)
         _widget.setPlainText(_txt)
         self.statusBar().showMessage('READ')
+
+    def show_messagebox(self, _messagestr):
+        choice = QtWidgets.QMessageBox.question(self, 'Alert!', _messagestr,
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if choice == QtWidgets.QMessageBox.Yes:
+            return True
+            
+        else:
+            return False
 
 ################################################################################
 # STRUCTURAL MODEL
