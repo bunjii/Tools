@@ -15,7 +15,7 @@ from solver.classSolve import obtainInverseMatrix
 from solver.classSolve import obtainDefVector
 from solver.classSolve import obtainNormalForceStressStrain
 from solver.Node import Nodes
-from solver.DataIO import ReadInput, summaryInputData, resultTruss2d
+from solver.DataIO import ReadInput, resultTruss2d #summaryInputData, 
 
 
 class solve_2d_truss():

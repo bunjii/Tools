@@ -1,6 +1,6 @@
 # --- HEADER ---
 
-# ANALYSIS DATE: 2018/08/26 00:38:51
+# ANALYSIS DATE: 2018/08/31 09:12:32
 # NUMBER OF NODES: 12
 # NUMBER OF ELEMENTS: 21
 # NUMBER OF CONSTRAINTS: 2
@@ -10,6 +10,7 @@
 # (1: LINEAR STATIC, 2D TRUSS) 
 #        ID
 ATYP,     1
+UNIT,     1
 
 # --- NODE ---
 #        ID,          X,          Y

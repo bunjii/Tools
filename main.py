@@ -29,8 +29,8 @@ from solver.classSolve import (createLoadVector2d, createStiffnessMatrix2d,
                                obtainDefVector, obtainInverseMatrix,
                                obtainNormalForceStressStrain)
 from solver.Condition import Conditions
-from solver.DataIO import (ReadInput, Write_OutputData, WriteInputData2,
-                           resultTruss2d, summaryInputData)
+from solver.DataIO import (ReadInput, Write_OutputData, RegisterInputData,
+                           resultTruss2d)
 from solver.Node import Node, Nodes
 from solver.solve_2d_truss import solve_2d_truss
 from solver.StrData import StructuralData
@@ -61,6 +61,11 @@ class MyVisuClass(HasTraits):
         mlab.figure(figure=self.scene.mayavi_scene, bgcolor=(0.15, 0.15, 0.15))
 
     def plot_deformation(self, _strdata):
+        if os.name == 'nt': # windows
+            width_line = 1.0
+        else:
+            width_line = 2.0
+        
         # elements + elemtext
         self.scene.disable_render = True
         self.def_factor = 1.0
@@ -83,7 +88,7 @@ class MyVisuClass(HasTraits):
             ylist.append(n2.y + self.def_factor * n2.defY)
             zlist.append(0)
 
-            window.elemdef.append(mlab.plot3d(xlist, ylist, zlist, line_width=2.0,
+            window.elemdef.append(mlab.plot3d(xlist, ylist, zlist, line_width=width_line,
                                               opacity=0.8, tube_radius=None, color= color_def))
         self.scene.disable_render = False
 
@@ -305,10 +310,15 @@ class MyVisuClass(HasTraits):
 
     @staticmethod
     def LinePlot(_sid, _eid, _nodes):
+        if os.name == 'nt': # windows
+            width_line = 1.0
+        else:
+            width_line = 2.0
+
         spt = _nodes.findNodeById(_sid)
         ept = _nodes.findNodeById(_eid)
         mlab.plot3d([spt.x, ept.x], [spt.y, ept.y], [0.0, 0.0], 
-                                 line_width=2.0, opacity=1.0, tube_radius=None)
+                                 line_width=width_line, opacity=1.0, tube_radius=None)
 
 
 ################################################################################
@@ -619,14 +629,17 @@ class MyMainWindow(QMainWindow):
         self.setWindowTitle(self.window_title+" :: "+str(self.fname[0]))
     
         data.ResetStrData()
+        # read input ####################################################################
         ReadInput(f.readlines(), data)
+        #################################################################################
         f.close()
 
         self.mayavi_widget.visualization.plot_model_geometry(data)  
 
         filepath = self.fname[0]
-        input_text = WriteInputData2(data)
-        # self.render_text(self.tab1, input_text)
+        # write input data #############################################################
+        input_text = RegisterInputData(data)
+        ################################################################################
         self.render_text(self.tab1.textfield, input_text)
 
     def render_text(self, _widget, _txt):

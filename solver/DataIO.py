@@ -9,50 +9,6 @@ import solver.Node
 import solver.classElement
 
 # ****** DATA INPUT ******
-
-"""
-def ReadInput(filename, _nodes, _elements, _materials,
-              _secs, _constraints, _loads):
-
-    dataIn = open(filename, 'r')
-    lines = dataIn.readlines()
-    dataIn.close()
-
-    for i in range(len(lines)):
-        items = []
-        # continue with comment lines
-        if lines[i].startswith('#'):
-            continue
-        # node id, x, y
-        elif lines[i].startswith('n') or lines[i].startswith('N'):
-            items = lines[i].split(',')
-            _nodes.append_node(int(items[1]), float(items[2]), float(items[3]))
-        # element id, n1, n2, material type, section type
-        elif lines[i].startswith('elem'):
-            items = lines[i].split(',')
-            _elements.appendElement( \
-            int(items[1]), int(items[2]), int(items[3]), int(items[4]), int(items[5]))
-        # material id, name, e-module
-        elif lines[i].startswith('mat'):
-            items = lines[i].split(',')
-            _materials.appendMaterial(int(items[1]), str(items[2].strip()), float(items[3]))
-        # section id, area, moment of inertia
-        elif lines[i].startswith('sec'):
-            items = lines[i].split(',')
-            _secs.appendSection(int(items[1]), float(items[2]), float(items[3]))
-        # constraint id, node id, condition x, condition y
-        elif lines[i].startswith('constr'):
-            items = lines[i].split(',')
-            _constraints.appendConstraint( \
-            int(items[1]), int(items[2]), int(items[3]), int(items[4]))
-        # load id, node id, load x, load y
-        elif lines[i].startswith('load'):
-            items = lines[i].split(',')
-            _loads.appendLoad(int(items[1]), int(items[2]), float(items[3]), float(items[4]))
-
-        else: continue
-"""
-
 def ReadInput(_filelines, _strdata):
 
     lines = _filelines
@@ -71,40 +27,48 @@ def ReadInput(_filelines, _strdata):
         if lines[i].startswith('#'):
             continue
         # node id, x, y
-        elif lines[i].startswith('n') or lines[i].startswith('N') or lines[i].startswith('NODE'):
+        elif (lines[i].startswith('n') or lines[i].startswith('N')):
+            #or lines[i].startswith('node') or lines[i].startswith('NODE')):
             items = lines[i].split(',')
             _nodes.append_node(int(items[1]), float(items[2]), float(items[3]))
         # element id, n1, n2, material type, section type
-        elif lines[i].startswith('e') or lines[i].startswith('elem') or lines[i].startswith('ELEM'):
+        elif (lines[i].startswith('e') or lines[i].startswith('E')):
+            # or lines[i].startswith('elem') or lines[i].startswith('ELEM')):
             items = lines[i].split(',')
             _elements.appendElement( \
             int(items[1]), int(items[2]), int(items[3]), int(items[4]), int(items[5]))
         # material id, name, e-module
-        elif lines[i].startswith('mat') or lines[i].startswith('MAT'):
+        elif (lines[i].startswith('m') or lines[i].startswith('M')):
+            # lines[i].startswith('mat') or lines[i].startswith('MAT'):
             items = lines[i].split(',')
             _materials.appendMaterial(int(items[1]), str(items[2].strip()), float(items[3]))
         # section id, area, moment of inertia
-        elif lines[i].startswith('sec') or lines[i].startswith('SEC'):
+        elif (lines[i].startswith('s') or lines[i].startswith('S')):
             items = lines[i].split(',')
             _secs.appendSection(int(items[1]), float(items[2]), float(items[3]))
         # constraint id, node id, condition x, condition y
-        elif lines[i].startswith('constr') or lines[i].startswith('CONS'):
+        elif lines[i].startswith('c') or lines[i].startswith('C'):
             items = lines[i].split(',')
             _constraints.appendConstraint( \
             int(items[1]), int(items[2]), int(items[3]), int(items[4]))
         # load id, node id, load x, load y
-        elif lines[i].startswith('load') or lines[i].startswith('LOAD'):
+        elif lines[i].startswith('l') or lines[i].startswith('L'):
             items = lines[i].split(',')
             _loads.appendLoad(int(items[1]), int(items[2]), float(items[3]), float(items[4]))
 
-        elif lines[i].startswith('a') or lines[i].startswith('ATYP'):
+        elif lines[i].startswith('a') or lines[i].startswith('A'):
             # print(_conds.AnalysisType)
             items = lines[i].split(',')
-            _conds.AnalysisType = int(items[1])
+            _conds.analysisType = int(items[1])
             # print (_conds.AnalysisType)
+
+        elif lines[i].startswith('u') or lines[i].startswith('U'):
+            items = lines[i].split(',')
+            _conds.unit = int(items[1])
 
         else: continue
 
+'''
 def readInput2dR(filename, _nodes, _elements, _materials,
                  _secs, _constraints, _loads):
 
@@ -138,7 +102,7 @@ def readInput2dR(filename, _nodes, _elements, _materials,
             _loads.appendLoad2dR(int(items[1]), int(items[2]), float(items[3]), float(items[4]), float(items[5]))
             
         else: continue
-        
+
 def readInput3dTruss(filename, _nodes, _elements, _materials, 
               _secs, _constraints, _loads):
     
@@ -172,9 +136,12 @@ def readInput3dTruss(filename, _nodes, _elements, _materials,
             _loads.appendLoad3d(int(items[1]), int(items[2]), float(items[3]), float(items[4]), float(items[5]))
             
         else: continue
+'''
 
+########################################################################################
 # Writing functions
-
+########################################################################################
+'''
 def WriteInputData(filepath, _strdata):
     
     _nodes = _strdata.Nodes
@@ -246,8 +213,9 @@ def WriteInputData(filepath, _strdata):
     f.write('<END OF INPUT DATA> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
     
     f.close()
+'''
 
-def WriteInputData2(_strdata):
+def RegisterInputData(_strdata):
     
     _nodes = _strdata.Nodes
     _elements = _strdata.Elems
@@ -318,6 +286,7 @@ def WriteInputData2(_strdata):
     
     return _tmplns
 
+'''
 def summaryInputData(filename, _nodes, _elements, _materials,
                      _sectionTypes, _constraints, _loads):
     
@@ -498,7 +467,8 @@ def summaryInputData3dTruss(filename, _nodes, _elements, _materials,
     f.write('<end of the input data> ' + str(datetime.datetime.now().strftime('%Y/%m/%d %H:%M:%S')))
 
     f.close()
-    
+'''
+
 # ****** DATA OUTPUT ******  
 def resultTruss2d(filename, _nodes, _elements):
 
