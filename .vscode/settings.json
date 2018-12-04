@@ -1,6 +1,7 @@
 {
     "python.linting.pylintArgs": [
         "--extension-pkg-whitelist=PyQt5, numpy, sip"
-    ]
+    ],
+    "python.pythonPath": "D:\\Users\\92245\\AppData\\Local\\conda\\conda\\envs\\py37\\python.exe"
 
 }

@@ -6,6 +6,8 @@ from datetime import datetime
 import numpy as np
 from mayavi import mlab
 from mayavi.core.ui.api import MayaviScene, MlabSceneModel, SceneEditor
+# from PyQt5 import sip
+# from PyQt5 import sip
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtGui import QFont, QIcon, QTextCursor
